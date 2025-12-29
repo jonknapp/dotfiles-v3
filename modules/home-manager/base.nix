@@ -3,7 +3,7 @@
   ...
 }:
 {
-  flake.modules.homeManager.generic =
+  flake.modules.homeManager.base =
     {
       config,
       lib,

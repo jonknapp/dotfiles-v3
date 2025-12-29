@@ -12,7 +12,8 @@ in
     { pkgs, ... }:
     {
       imports = with inputs.self.modules.homeManager; [
-        generic
+        base
+        commonApplications
       ];
 
       home.username = "${username}";
