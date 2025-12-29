@@ -18,7 +18,10 @@ in
 
       home.username = "${username}";
 
-      programs.nixToolbox.containerName = "nix-43";
+      programs.nixToolbox = {
+        enable = true;
+        containerName = "nix-43";
+      };
     };
 
   flake.homeConfigurations = inputs.self.lib.mkHomeManager "x86_64-linux" "${configHame}";

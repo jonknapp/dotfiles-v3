@@ -9,11 +9,9 @@
       ...
     }:
     {
-      imports = with inputs.self.modules.homeManager; [
-        atomic
+      imports = [
+        ../../programs/nix-toolbox.nix
       ];
-
-      programs.nixToolbox.enable = true;
 
       home.homeDirectory = "/var/home/${config.home.username}";
     };
