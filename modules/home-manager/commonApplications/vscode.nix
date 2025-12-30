@@ -11,9 +11,6 @@
     }:
     {
       home.packages = with pkgs; [
-        nerd-fonts.fira-code
-        noto-fonts-color-emoji
-        noto-fonts-monochrome-emoji
         vscode
       ];
 
