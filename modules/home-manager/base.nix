@@ -20,5 +20,7 @@
       home.stateVersion = lib.mkDefault "25.11";
 
       nixpkgs.config.allowUnfree = lib.mkDefault true;
+
+      programs.home-manager.enable = true;
     };
 }
