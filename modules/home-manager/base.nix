@@ -21,6 +21,6 @@
 
       nixpkgs.config.allowUnfree = lib.mkDefault true;
 
-      programs.home-manager.enable = true;
+      programs.home-manager.enable = lib.mkDefault true;
     };
 }
