@@ -69,8 +69,10 @@ let
     # NOTE: Does not appear to work in cosmic atomic
     # cp -L ~/.config/nix-toolbox-profile/mimeapps.list "$HOME/.config/"
 
-    mkdir "$data_dir/fonts"
-    cp -rL ~/.nix-profile/share/fonts/* "$data_dir/fonts/"
+    if [ -d "$data_dir/fonts/" ]; then
+      mkdir "$data_dir/fonts"
+      cp -rL ~/.nix-profile/share/fonts/* "$data_dir/fonts/"
+    fi
 
     # if [ -f ~/.config/fontconfig/conf.d/52-default-fonts.conf ]; then
     #   sudo rm ~/.config/fontconfig/conf.d/52-default-fonts.conf
