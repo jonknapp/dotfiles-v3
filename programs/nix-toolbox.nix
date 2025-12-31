@@ -63,13 +63,15 @@ let
     fi
     mkdir --parents "$data_dir"
 
-    mkdir "$data_dir/applications"
-    cp -rL ~/.nix-profile/share/applications/* "$data_dir/applications/"
+    if [ -d ~/.nix-profile/share/applications ]; then
+      mkdir "$data_dir/applications"
+      cp -rL ~/.nix-profile/share/applications/* "$data_dir/applications/"
+    fi
 
     # NOTE: Does not appear to work in cosmic atomic
     # cp -L ~/.config/nix-toolbox-profile/mimeapps.list "$HOME/.config/"
 
-    if [ -d "$data_dir/fonts/" ]; then
+    if [ -d ~/.nix-profile/share/fonts ]; then
       mkdir "$data_dir/fonts"
       cp -rL ~/.nix-profile/share/fonts/* "$data_dir/fonts/"
     fi
@@ -86,13 +88,17 @@ let
 
     /usr/bin/flatpak-spawn --host fc-cache -f
 
-    mkdir "$data_dir/icons/"
-    cp -rL ~/.nix-profile/share/icons/* "$data_dir/icons/"
+    if [ -d ~/.nix-profile/share/icons ]; then
+      mkdir "$data_dir/icons/"
+      cp -rL ~/.nix-profile/share/icons/* "$data_dir/icons/"
+    fi
 
     mkdir --parents ~/.bashrc.d
 
-    # I think we want to always call this; inside toolbox or on host
-    cp -f ~/.nix-profile/etc/profile.d/hm-session-vars.sh ~/.bashrc.d/hm-session-vars.sh
+    if [ -f ~/.nix-profile/etc/profile.d/hm-session-vars.sh ]; then
+      # I think we want to always call this; inside toolbox or on host
+      cp -f ~/.nix-profile/etc/profile.d/hm-session-vars.sh ~/.bashrc.d/hm-session-vars.sh
+    fi
 
     if [ -f "~/.config/nix-toolbox-profile/.ssh/config" ]; then
       rm -f "$HOME/.ssh/config"

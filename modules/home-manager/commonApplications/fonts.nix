@@ -15,6 +15,6 @@
         noto-fonts-monochrome-emoji
       ];
 
-      fonts.fontconfig.enable = true;
+      fonts.fontconfig.enable = false;
     };
 }
