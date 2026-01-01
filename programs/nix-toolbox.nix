@@ -127,6 +127,25 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    home.activation.clearSystemdUser = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
+      run rm -rf ~/.config/systemd/user
+    '';
+
+    home.activation.duplicateSystemdUnits = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+      echo "Duplicating systemd user units to host"
+
+      if [ -d ~/.config/systemd/user ]; then
+        run echo "Backing up existing systemd user units"
+        run mv ~/.config/systemd/user ~/.config/systemd/user.original
+        run mkdir -p ~/.config/systemd/user
+        run cp -rL ~/.config/systemd/user.original/* ~/.config/systemd/user
+      fi
+
+      if [ -d ~/.config/systemd/user.original ]; then
+        run rm -rf ~/.config/systemd/user.original
+      fi
+    '';
+
     home.activation.setupNixToolbox = lib.hm.dag.entryAfter [ "reloadSystemd" ] ''
       run ${postActivation}/bin/nix-toolbox-post-activation
     '';
