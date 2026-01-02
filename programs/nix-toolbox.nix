@@ -161,6 +161,8 @@ in
       hostHostname
     ];
 
+    home.sessionVariablesExtra = lib.mkForce "";
+
     # disable home-manager so we rely on our wrapper instead
     programs.home-manager.enable = false;
 
