@@ -39,6 +39,11 @@ let
     installPhase = ''
       mkdir -p $out/bin
 
+      cat <<EOF > $out/bin/systemctl
+      #!/bin/bash
+      /usr/bin/flatpak-spawn --host systemctl "\$@"
+      EOF
+
       cat <<EOF > $out/bin/xdg-open
       #!/bin/bash
       /usr/bin/flatpak-spawn --env=DISPLAY=:0 --host xdg-open "\$@"
@@ -158,5 +163,8 @@ in
 
     # disable home-manager so we rely on our wrapper instead
     programs.home-manager.enable = false;
+
+    systemd.user.systemctlPath = "${hostBinaries}/bin/systemctl";
+    targets.genericLinux.enable = true;
   };
 }
