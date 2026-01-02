@@ -48,14 +48,14 @@
       systemd.user.services.tailscale-systray = {
         Unit = {
           Description = "Start tailscale systray";
-          Wants = [ "tailscaled.target" ];
-          After = [
-            "systemd-resolved.service"
+          Requires = [
+            "tailscaled.service"
+            "tray.target"
           ];
-        };
-
-        Install = {
-          WantedBy = [ "default.target" ];
+          After = [
+            "tailscaled.service"
+            "tray.target"
+          ];
         };
 
         Service = {
@@ -75,10 +75,7 @@
             "NetworkManager.service"
             "systemd-resolved.service"
           ];
-        };
-
-        Install = {
-          WantedBy = [ "default.target" ];
+          PartOf = [ "tailscale-systray.service" ];
         };
 
         Service = {
@@ -100,7 +97,7 @@
       xdg.desktopEntries = {
         tailscale-systray = {
           name = "Tailscale Systray";
-          exec = "toolbox --container ${config.programs.nixToolbox.containerName} run tailscale systray";
+          exec = "systemctl --user start --no-block tailscale-systray.service";
           terminal = false;
           categories = [
             "Network"
