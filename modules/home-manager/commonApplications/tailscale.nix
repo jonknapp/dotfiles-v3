@@ -62,7 +62,7 @@
           ExecStart = ''
             toolbox --container ${config.programs.nixToolbox.containerName} run tailscale systray
           '';
-          Type = "one-shot";
+          Type = "exec";
         };
       };
 
@@ -75,7 +75,7 @@
             "NetworkManager.service"
             "systemd-resolved.service"
           ];
-          PartOf = [ "tailscale-systray.service" ];
+          BindsTo = [ "tailscale-systray.service" ];
         };
 
         Service = {
@@ -96,7 +96,7 @@
 
       xdg.desktopEntries = {
         tailscale-systray = {
-          name = "Tailscale Systray";
+          name = "Tailscale";
           exec = "systemctl --user start --no-block tailscale-systray.service";
           terminal = false;
           categories = [
