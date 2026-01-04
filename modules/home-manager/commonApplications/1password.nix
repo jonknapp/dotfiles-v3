@@ -22,13 +22,8 @@
       };
 
       programs.ssh = {
-        enable = true;
-        enableDefaultConfig = false;
         package = pkgs.emptyDirectory;
         matchBlocks = {
-          # "*.repo.borgbase.com" = {
-          #   identityFile = "~/.ssh/id_ed25519.pub";
-          # };
           "*" = {
             extraOptions = {
               IdentityAgent = "~/.1password/agent.sock";
@@ -55,8 +50,5 @@
           ''
         ))
       ];
-
-      # TODO: Move me to nix-toolbox
-      home.file.".ssh/config".target = "${config.xdg.configHome}/nix-toolbox-profile/.ssh/config";
     };
 }
