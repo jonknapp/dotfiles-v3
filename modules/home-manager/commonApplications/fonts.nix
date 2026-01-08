@@ -1,5 +1,6 @@
 {
   inputs,
+  lib,
   ...
 }:
 {
@@ -15,6 +16,16 @@
         noto-fonts-monochrome-emoji
       ];
 
-      fonts.fontconfig.enable = false;
+      fonts.fontconfig.enable = lib.mkDefault false;
     };
+
+  flake.modules.homeManager.nixToolbox = {
+    xdg.configFile."fontconfig/fonts.conf".text = ''
+      <?xml version="1.0"?>
+      <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+      <fontconfig>
+        <dir>~/.local/share/nix-toolbox-profile/share/fonts/</dir>
+      </fontconfig>
+    '';
+  };
 }

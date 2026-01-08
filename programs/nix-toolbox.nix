@@ -81,15 +81,35 @@ let
       cp -rL ~/.nix-profile/share/fonts/* "$data_dir/fonts/"
     fi
 
-    # if [ -f ~/.config/fontconfig/conf.d/52-default-fonts.conf ]; then
-    #   sudo rm ~/.config/fontconfig/conf.d/52-default-fonts.conf
-    # fi
-    # cp ~/.config/fontconfig/conf.d/52-hm-default-fonts.conf ~/.config/fontconfig/conf.d/52-default-fonts.conf
+    # Required to force Cosmic Text into allowing nix font override.
+    if [ -f ~/.config/fontconfig/fonts.conf ]; then
+      target="$(readlink -f ~/.config/fontconfig/fonts.conf)"
 
-    # if [ -f ~/.config/fontconfig/conf.d/90-noto-emoji-disable.conf ]; then
-    #   sudo rm ~/.config/fontconfig/conf.d/90-noto-emoji-disable.conf
-    # fi
-    # cp ~/.config/fontconfig/conf.d/90-hm-noto-emoji-disable.conf ~/.config/fontconfig/conf.d/90-noto-emoji-disable.conf
+      # Only proceed if the symlink resolves to a regular file
+      if [[ -f "$target" ]]; then
+        # Remove the symlink
+        rm ~/.config/fontconfig/fonts.conf
+
+        # Copy the real file into its place
+        cp -a "$target" ~/.config/fontconfig/fonts.conf
+      fi
+    fi
+
+    CONF_DIR="$HOME/.config/fontconfig/conf.d"
+    if [ -d "$CONF_DIR" ]; then
+      find "$CONF_DIR" -maxdepth 1 -type l | while read -r link; do
+        target="$(readlink -f "$link")"
+
+        # Only proceed if the symlink resolves to a regular file
+        if [[ -f "$target" ]]; then
+          # Remove the symlink
+          rm "$link"
+
+          # Copy the real file into its place
+          cp -a "$target" "$link"
+        fi
+      done
+    fi
 
     /usr/bin/flatpak-spawn --host fc-cache -f
 
@@ -133,6 +153,8 @@ in
 
   config = lib.mkIf cfg.enable {
     home.activation.clearSystemdUser = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
+      run rm -rf ~/.config/fontconfig/conf.d
+      run rm -rf ~/.config/fontconfig/fonts.conf
       run rm -rf ~/.config/systemd/user
     '';
 
