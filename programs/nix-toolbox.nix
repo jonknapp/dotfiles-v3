@@ -39,6 +39,11 @@ let
     installPhase = ''
       mkdir -p $out/bin
 
+      cat <<EOF > $out/bin/podman
+      #!/bin/bash
+      /usr/bin/flatpak-spawn --host podman "\$@"
+      EOF
+
       cat <<EOF > $out/bin/systemctl
       #!/bin/bash
       /usr/bin/flatpak-spawn --host systemctl "\$@"
