@@ -1,5 +1,6 @@
 {
   config,
+  inputs,
   lib,
   pkgs,
   ...
@@ -8,25 +9,27 @@
 let
   cfg = config.programs.nixToolbox;
 
-  homeManagerWrapper = pkgs.writeShellScriptBin "home-manager" ''
-    #!/bin/bash
+  homeManagerWrapper = inputs.wrappers.lib.wrapPackage {
+    inherit pkgs;
+    package = pkgs.home-manager;
+    runtimeInputs = [ hostHostname ];
+    flags = {
+      "--flake" = "$HOME/.config/home-manager#$USER@$(host-hostname)";
+    };
+    preHook = ''
+      flake_found=false
 
-    has_flake=false
-    for arg in "$@"; do
-      if [[ "$arg" == "--flake" ]]; then
-        has_flake=true
-        break
+      for arg in "$@"; do
+        if [[ "$arg" == "--flake" ]]; then
+          flake_found=true
+        fi
+      done
+
+      if ! $flake_found; then
+        echo "using: --flake $HOME/.config/home-manager#$USER@$(host-hostname)" >&2
       fi
-    done
-
-    if $has_flake; then
-      exec ${pkgs.home-manager}/bin/home-manager "$@"
-    else
-      hostname="$(${hostHostname}/bin/host-hostname)"
-      echo "using: --flake $HOME/.config/home-manager#$USER@$hostname"
-      exec ${pkgs.home-manager}/bin/home-manager "$@" "--flake" "$HOME/.config/home-manager#$USER@$hostname";
-    fi
-  '';
+    '';
+  };
 
   hostBinaries = pkgs.stdenv.mkDerivation {
     name = "fedoraHost";

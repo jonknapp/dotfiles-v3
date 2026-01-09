@@ -18,6 +18,10 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     nixpkgs-lib.follows = "nixpkgs";
     systems.url = "github:nix-systems/default";
+    wrappers = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:lassulus/wrappers";
+    };
   };
 
 }

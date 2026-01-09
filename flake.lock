@@ -97,7 +97,8 @@
         "nixpkgs-lib": [
           "nixpkgs"
         ],
-        "systems": "systems"
+        "systems": "systems",
+        "wrappers": "wrappers"
       }
     },
     "systems": {
@@ -112,6 +113,26 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "wrappers": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1767819491,
+        "narHash": "sha256-Bz/+/Kl0iAqGJ9n6/J7m3fvoG704QHr0QxvCEKYBruQ=",
+        "owner": "lassulus",
+        "repo": "wrappers",
+        "rev": "73cdd598454136c1fb0510c3dd8bf30d9211942f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "lassulus",
+        "repo": "wrappers",
         "type": "github"
       }
     }
