@@ -20,5 +20,7 @@
         ];
 
       home.homeDirectory = "/var/home/${config.home.username}";
+
+      programs.nixToolbox.enable = true;
     };
 }
