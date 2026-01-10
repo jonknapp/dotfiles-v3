@@ -21,6 +21,29 @@
         # OP_PLUGIN_ALIASES_SOURCED = "1";
       };
 
+      programs.bash = {
+        initExtra = ''
+          # Add onepassword-cli group required for 1password CLI integration to work
+          if ! grep -q onepassword-cli /etc/group; then
+            echo "Adding 'onepassword-cli' group"
+            sudo groupadd -f onepassword-cli
+            sudo usermod -aG onepassword-cli $(whoami)
+          fi
+
+          # 1password needs to be run with the correct group for app CLI integration to work
+          run-op() {
+            sg onepassword-cli -c "op $*"
+          }
+        '';
+
+        shellAliases = {
+          # 1password with plugins
+          op = "run-op";
+          #   gh = "run-op plugin run -- gh";
+          #   glab = "run-op plugin run -- glab";
+        };
+      };
+
       programs.ssh = {
         package = pkgs.emptyDirectory;
         matchBlocks = {
