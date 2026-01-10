@@ -13,7 +13,7 @@ in
     {
       imports = with inputs.self.modules.homeManager; [
         base
-        commonApplications
+        common-applications
       ];
 
       home.username = "${username}";

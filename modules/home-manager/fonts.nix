@@ -4,7 +4,7 @@
   ...
 }:
 {
-  flake.modules.homeManager.commonApplications =
+  flake.modules.homeManager.fonts =
     {
       pkgs,
       ...

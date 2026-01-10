@@ -13,8 +13,8 @@ in
     {
       imports = with inputs.self.modules.homeManager; [
         base
-        commonApplications
-        cosmicAtomic
+        common-applications
+        cosmic-atomic
       ];
 
       home.username = "${username}";

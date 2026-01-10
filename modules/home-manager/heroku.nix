@@ -3,7 +3,7 @@
   ...
 }:
 {
-  flake.modules.homeManager.commonApplications =
+  flake.modules.homeManager.heroku =
     {
       config,
       pkgs,

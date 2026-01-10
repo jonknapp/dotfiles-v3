@@ -3,7 +3,7 @@
   ...
 }:
 {
-  flake.modules.homeManager.cosmicAtomic =
+  flake.modules.homeManager.cosmic-atomic =
     {
       config,
       pkgs,

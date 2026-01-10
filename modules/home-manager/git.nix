@@ -1,7 +1,7 @@
 { inputs, ... }:
 
 {
-  flake.modules.homeManager.commonApplications =
+  flake.modules.homeManager.git =
     {
       config,
       pkgs,
