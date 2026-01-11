@@ -29,7 +29,7 @@
       home.file.".profile".target = "${config.xdg.configHome}/bash/.profile";
 
       # run this last after the shell has been setup
-      programs.bash.initExtra = lib.mkOrder 2000 ''
+      programs.bash.initExtra = lib.mkAfter ''
         # resolve issues with dbus activation environment
         flatpak-spawn --host --env=DISPLAY=:0 dbus-update-activation-environment --all --systemd
       '';
