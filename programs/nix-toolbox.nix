@@ -191,6 +191,7 @@ in
       hostHostname
     ];
 
+    # force hm session bash file _not_ include sourcing nix.sh
     home.sessionVariablesExtra = lib.mkForce "";
 
     # disable home-manager so we rely on our wrapper instead
