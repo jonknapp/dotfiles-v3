@@ -16,6 +16,7 @@
         fonts
         git
         heroku
+        opencode
         ssh
         starship
         sublime-merge
