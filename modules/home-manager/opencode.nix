@@ -10,16 +10,29 @@
       ...
     }:
     let
-      opencode-in-docker = pkgs.writeShellApplication {
-        name = "opencode-in-docker";
+      opencode-in-container = pkgs.writeShellApplication {
+        name = "opencode-in-container";
         text = ''
-          podman run -it --rm --privileged -v "$(pwd):/workspace" -v ~/.config/opencode:/home/opencode/.config/opencode -w /workspace ghcr.io/anomalyco/opencode "$@"
+          printf "Running opencode in a container with %s as workspace. Continue? (y/N) " "$(pwd)"
+
+          mkdir -p ${config.xdg.configHome}/opencode ${config.xdg.dataHome}/opencode
+
+          read -r confirm
+          if [ "$confirm" != "Y" ] && [ "$confirm" != "y" ]; then
+            exit 1
+          fi
+
+          podman run -it --rm --privileged \
+            -v "$(pwd):/workspace" \
+            -v ${config.xdg.configHome}/opencode:/home/opencode/.config/opencode \
+            -v ${config.xdg.dataHome}/opencode:/home/opencode/.local/share/opencode \
+            -w /workspace ghcr.io/anomalyco/opencode "$@"
         '';
       };
     in
     {
       home.packages = [
-        opencode-in-docker
+        opencode-in-container
       ];
     };
 }
