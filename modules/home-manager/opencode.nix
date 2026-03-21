@@ -24,8 +24,8 @@
 
           podman run -it --rm --privileged \
             -v "$(pwd):/workspace" \
-            -v ${config.xdg.configHome}/opencode:/home/opencode/.config/opencode \
-            -v ${config.xdg.dataHome}/opencode:/home/opencode/.local/share/opencode \
+            -v ${config.xdg.configHome}/opencode:/root/.config/opencode \
+            -v ${config.xdg.dataHome}/opencode:/root/.local/share/opencode \
             -w /workspace ghcr.io/anomalyco/opencode "$@"
         '';
       };
