@@ -22,7 +22,11 @@
             exit 1
           fi
 
-          podman run -it --rm --privileged \
+          podman run -it --rm \
+            --cap-add=SYS_ADMIN,MKNOD,NET_ADMIN,SETUID,SETGID \
+            --security-opt label=disable \
+            --security-opt seccomp=unconfined \
+            --device /dev/fuse \
             -v "$(pwd):/workspace" \
             -v ${config.xdg.configHome}/opencode:/root/.config/opencode \
             -v ${config.xdg.dataHome}/opencode:/root/.local/share/opencode \
