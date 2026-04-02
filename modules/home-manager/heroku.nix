@@ -19,6 +19,7 @@
       heroku-pg-import = pkgs.writeShellApplication {
         name = "heroku-postgres-import";
         text = ''
+          dump_file="''${1:-latest.dump}"
           pg_user=postgres
           # prefix="${pkgs.docker-compose}/bin/docker-compose exec -T postgres"
           prefix="podman-compose exec -T postgres"
@@ -34,7 +35,7 @@
           $prefix psql -U "$pg_user" -d app_dev -c "CREATE SCHEMA IF NOT EXISTS heroku_ext;"
 
           # NOTE: pg_restore arguments that were removed to also run with devenv: --exit-on-error --if-exists
-          $prefix pg_restore --verbose --clean --no-acl --no-owner -U "$pg_user" -d app_dev < latest.dump
+          $prefix pg_restore --verbose --clean --no-acl --no-owner -U "$pg_user" -d app_dev < "$dump_file"
         '';
       };
     in
