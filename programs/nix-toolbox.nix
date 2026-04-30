@@ -133,9 +133,9 @@ let
       cp -f ~/.nix-profile/etc/profile.d/hm-session-vars.sh ~/.bashrc.d/hm-session-vars.sh
     fi
 
-    if [ -f "~/.config/nix-toolbox-profile/.ssh/config" ]; then
+    if [ -f "$HOME/.config/nix-toolbox-profile/.ssh/config" ]; then
       rm -f "$HOME/.ssh/config"
-      cp -L ~/.config/nix-toolbox-profile/.ssh/config "$HOME/.ssh/config"
+      cp -L "$HOME/.config/nix-toolbox-profile/.ssh/config" "$HOME/.ssh/config"
     fi
 
     # Commented out because it seems to be called by Home Manager.
