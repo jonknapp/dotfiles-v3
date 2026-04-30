@@ -13,11 +13,6 @@
       programs.ssh = {
         enable = true;
         enableDefaultConfig = false;
-        matchBlocks = {
-          # "*.repo.borgbase.com" = {
-          #   identityFile = "~/.ssh/id_ed25519.pub";
-          # };
-        };
       };
     };
 
