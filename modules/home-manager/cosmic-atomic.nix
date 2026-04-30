@@ -8,15 +8,13 @@
       config,
       pkgs,
       ...
-    }@args:
+    }:
     {
       imports =
         with inputs.self.modules.homeManager;
         [
           nixToolbox
-        ]
-        ++ [
-          (import ../../programs/nix-toolbox.nix (args // { inherit inputs; }))
+          ../../programs/nix-toolbox.nix
         ];
 
       home.homeDirectory = "/var/home/${config.home.username}";
