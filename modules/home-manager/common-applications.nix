@@ -9,7 +9,6 @@
       imports = with inputs.self.modules.homeManager; [
         _1password
         bash
-        borg
         chromium
         direnv
         discord
@@ -22,6 +21,7 @@
         sublime-merge
         tailscale
         vscode
+        vykar
         xdg
       ];
 

@@ -1,5 +1,20 @@
 {
   "nodes": {
+    "crane": {
+      "locked": {
+        "lastModified": 1775236976,
+        "narHash": "sha256-gCgX+AXN7K1gAIEqcLcZHxmC+QoZcwn9m6Z9r2Az+N8=",
+        "owner": "ipetkov",
+        "repo": "crane",
+        "rev": "6c23998526351a53ce734f0ac84940da988ccef1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ipetkov",
+        "repo": "crane",
+        "type": "github"
+      }
+    },
     "flake-file": {
       "locked": {
         "lastModified": 1776202746,
@@ -18,7 +33,7 @@
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": [
-          "nixpkgs-lib"
+          "nixpkgs"
         ]
       },
       "locked": {
@@ -32,6 +47,24 @@
       "original": {
         "owner": "hercules-ci",
         "repo": "flake-parts",
+        "type": "github"
+      }
+    },
+    "flake-utils": {
+      "inputs": {
+        "systems": "systems"
+      },
+      "locked": {
+        "lastModified": 1731533236,
+        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
         "type": "github"
       }
     },
@@ -73,18 +106,15 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1777395829,
-        "narHash": "sha256-HposVFZcsBCevgqLR73w/BpSe8J1lMgw5kASnnxO3A4=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "e75f25705c2934955ee5075e62530d74aca973c6",
-        "type": "github"
+        "lastModified": 1777641297,
+        "narHash": "sha256-TT4ptFjjqRdOAlPQRwXpV0ChKARdTvUYYpLMrDSVW4s=",
+        "rev": "c6d65881c5624c9cae5ea6cedef24699b0c0a4c0",
+        "type": "tarball",
+        "url": "https://releases.nixos.org/nixpkgs/nixpkgs-26.05pre990482.c6d65881c562/nixexprs.tar.xz"
       },
       "original": {
-        "owner": "nixos",
-        "ref": "nixpkgs-unstable",
-        "repo": "nixpkgs",
-        "type": "github"
+        "type": "tarball",
+        "url": "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz"
       }
     },
     "root": {
@@ -94,11 +124,65 @@
         "home-manager": "home-manager",
         "import-tree": "import-tree",
         "nixpkgs": "nixpkgs",
-        "nixpkgs-lib": [
-          "nixpkgs"
-        ],
-        "systems": "systems",
+        "vykar": "vykar",
         "wrappers": "wrappers"
+      }
+    },
+    "rust-overlay": {
+      "inputs": {
+        "nixpkgs": [
+          "vykar",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1775617983,
+        "narHash": "sha256-2NWGA/I4j/qlx6qbg86QvJiK1/GyH9gnf0hFiARWVwE=",
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "rev": "d98b91b1feae7ef07fa2ccb3aa3f83f11abfae54",
+        "type": "github"
+      },
+      "original": {
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "type": "github"
+      }
+    },
+    "skia-binaries-aarch64-darwin": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-8k2f0muEP5p8RNDSMxVZ3r+LPeufeRvYCC0ZvWg08VY=",
+        "type": "file",
+        "url": "https://github.com/rust-skia/skia-binaries/releases/download/0.90.0/skia-binaries-da4579b39b75fa2187c5-aarch64-apple-darwin-gl-pdf-textlayout-vulkan.tar.gz"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://github.com/rust-skia/skia-binaries/releases/download/0.90.0/skia-binaries-da4579b39b75fa2187c5-aarch64-apple-darwin-gl-pdf-textlayout-vulkan.tar.gz"
+      }
+    },
+    "skia-binaries-aarch64-linux": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-d6Bcvz8+jRWneN1CKHZ9/630+OHkafGY/kec/uf3hBk=",
+        "type": "file",
+        "url": "https://github.com/rust-skia/skia-binaries/releases/download/0.90.0/skia-binaries-da4579b39b75fa2187c5-aarch64-unknown-linux-gnu-gl-pdf-textlayout-vulkan.tar.gz"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://github.com/rust-skia/skia-binaries/releases/download/0.90.0/skia-binaries-da4579b39b75fa2187c5-aarch64-unknown-linux-gnu-gl-pdf-textlayout-vulkan.tar.gz"
+      }
+    },
+    "skia-binaries-x86_64-linux": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-4x3zKy0SbnKHPl9T4for1hObYKuVKN2T83+AIh6HQZs=",
+        "type": "file",
+        "url": "https://github.com/rust-skia/skia-binaries/releases/download/0.90.0/skia-binaries-da4579b39b75fa2187c5-x86_64-unknown-linux-gnu-gl-pdf-textlayout-vulkan.tar.gz"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://github.com/rust-skia/skia-binaries/releases/download/0.90.0/skia-binaries-da4579b39b75fa2187c5-x86_64-unknown-linux-gnu-gl-pdf-textlayout-vulkan.tar.gz"
       }
     },
     "systems": {
@@ -113,6 +197,33 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "vykar": {
+      "inputs": {
+        "crane": "crane",
+        "flake-utils": "flake-utils",
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "rust-overlay": "rust-overlay",
+        "skia-binaries-aarch64-darwin": "skia-binaries-aarch64-darwin",
+        "skia-binaries-aarch64-linux": "skia-binaries-aarch64-linux",
+        "skia-binaries-x86_64-linux": "skia-binaries-x86_64-linux"
+      },
+      "locked": {
+        "lastModified": 1777621604,
+        "narHash": "sha256-UKshTYWypAN4lcLlTAqUdLIQElFs4XnaNv6zybi6wc4=",
+        "owner": "borgbase",
+        "repo": "vykar",
+        "rev": "195cef779b79cdbab1b93cc49c94f3a66ce962e6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "borgbase",
+        "ref": "main",
+        "repo": "vykar",
         "type": "github"
       }
     },
