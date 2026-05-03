@@ -16,10 +16,25 @@
       pkgs,
       ...
     }:
+    let
+      vykar-gui = inputs.vykar.packages.${pkgs.stdenv.hostPlatform.system}.vykar-gui;
+    in
     {
       home.packages = [
         inputs.vykar.packages.${pkgs.stdenv.hostPlatform.system}.vykar
-        inputs.vykar.packages.${pkgs.stdenv.hostPlatform.system}.vykar-gui
+        vykar-gui
       ];
+
+      xdg.desktopEntries = {
+        vykar = {
+          name = "Vykar - Backups";
+          exec = "toolbox run --container ${config.programs.nixToolbox.containerName} ${vykar-gui}/bin/vykar-gui";
+          terminal = false;
+          categories = [
+            "Network"
+          ];
+          icon = "application-x-executable";
+        };
+      };
     };
 }
