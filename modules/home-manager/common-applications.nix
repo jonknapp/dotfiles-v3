@@ -30,6 +30,7 @@
         nh
         nixfmt
         podman-compose
+        secretspec
       ];
     };
 }
