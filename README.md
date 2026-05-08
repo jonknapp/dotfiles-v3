@@ -1,7 +1,7 @@
 https://github.com/Doc-Steve/dendritic-design-with-flake-parts
 
 ```sh
-home-manager build --flake .#jon@zero
+nix run home-manager/master -- switch --flake .#jon@zero
 ```
 
 - If you add new files, make sure to `git add` them so they are included as modules.
