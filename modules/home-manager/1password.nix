@@ -9,11 +9,28 @@
       pkgs,
       ...
     }:
+    let
+      op = pkgs._1password-cli;
+      _1password-cli-sg = inputs.wrappers.lib.wrapPackage {
+        inherit pkgs;
+        package = op;
+        exePath = "${op}/bin/op";
+        binName = "op";
+        wrapper = attrs: ''
+          #!${pkgs.stdenv.shell}
+          sg onepassword-cli -c "${op}/bin/op $*"
+        '';
+      };
+    in
     {
-      home.packages = with pkgs; [
-        _1password-cli
-        _1password-gui
-      ];
+      home.packages =
+        with pkgs;
+        [
+          _1password-gui
+        ]
+        ++ [
+          _1password-cli-sg
+        ];
 
       home.sessionVariables = {
         SSH_AUTH_SOCK = "$HOME/.1password/agent.sock";
@@ -29,19 +46,7 @@
             sudo groupadd -f onepassword-cli
             sudo usermod -aG onepassword-cli $(whoami)
           fi
-
-          # 1password needs to be run with the correct group for app CLI integration to work
-          run-op() {
-            sg onepassword-cli -c "op $*"
-          }
         '';
-
-        shellAliases = {
-          # 1password with plugins
-          op = "run-op";
-          #   gh = "run-op plugin run -- gh";
-          #   glab = "run-op plugin run -- glab";
-        };
       };
 
       programs.ssh = {
