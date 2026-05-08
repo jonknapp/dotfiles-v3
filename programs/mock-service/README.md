@@ -18,6 +18,7 @@ A Python process that registers a
 [StatusNotifierItem](https://www.freedesktop.org/wiki/Specifications/StatusNotifierItem/)
 on the session D-Bus. Starts automatically via `WantedBy=tray.target` when the COSMIC
 session starts. Provides:
+
 - A green circle icon when `mock-service` is active, grey when inactive
 - Immediate "starting..." / "stopping..." label feedback when actions are triggered
 - A right-click menu with Start, Stop, and Quit items
@@ -26,7 +27,7 @@ session starts. Provides:
 
 **`mock-service-tray` binary**
 A Python script bundled as a Nix derivation using `dbus-python` and `pygobject3`. Lives in
-`~/.nix-profile/bin/` inside the `nix-43` toolbox container.
+`~/.nix-profile/bin/` inside the `nix-44` toolbox container.
 
 **`mock-service-tray.desktop`**
 An XDG desktop entry that lets the COSMIC app launcher manually start the tray service via
@@ -38,7 +39,7 @@ An XDG desktop entry that lets the COSMIC app launcher manually start the tray s
 COSMIC session starts
   -> tray.target activates
   -> mock-service-tray.service starts
-  -> toolbox --container nix-43 run mock-service-tray
+  -> toolbox --container nix-44 run mock-service-tray
   -> Python registers org.kde.StatusNotifierItem-mock-service on D-Bus
   -> RegisterStatusNotifierItem with com.system76.CosmicStatusNotifierWatcher
   -> COSMIC panel shows tray icon
@@ -75,13 +76,13 @@ User clicks Quit (service inactive)
 
 ### Why toolbox run is used for ExecStart
 
-Home-manager runs inside the `nix-43` toolbox container, but systemd runs on the host.
+Home-manager runs inside the `nix-44` toolbox container, but systemd runs on the host.
 The `duplicateSystemdUnits` activation hook copies unit files to `~/.config/systemd/user/`
 as plain files (not symlinks) so the host systemd can read them. However, Nix store paths
 (`/nix/store/...`) in `ExecStart` don't exist on the host filesystem — only inside the
 container.
 
-The solution is `toolbox --container nix-43 run <binary-name>`, which executes the binary
+The solution is `toolbox --container nix-44 run <binary-name>`, which executes the binary
 by name from the container's PATH (`~/.nix-profile/bin/`). This is the same pattern used
 by `tailscale-systray.service`.
 

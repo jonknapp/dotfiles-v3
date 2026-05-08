@@ -15,7 +15,7 @@ in
         cosmic-atomic
       ];
 
-      programs.nixToolbox.containerName = "nix-43";
+      programs.nixToolbox.containerName = "nix-44";
     };
 
   flake.homeConfigurations = inputs.self.lib.mkHomeManager {
