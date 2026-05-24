@@ -6,7 +6,8 @@
   flake-file.inputs = {
     vykar = {
       url = "github:borgbase/vykar/main";
-      inputs.nixpkgs.follows = "nixpkgs";
+      # pinned to stable since it takes forever to rebuild
+      inputs.nixpkgs.follows = "nixpkgs-stable";
     };
   };
 

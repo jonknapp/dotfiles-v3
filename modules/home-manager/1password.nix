@@ -51,11 +51,9 @@
 
       programs.ssh = {
         package = pkgs.emptyDirectory;
-        matchBlocks = {
-          "*" = {
-            extraOptions = {
-              IdentityAgent = "~/.1password/agent.sock";
-            };
+        settings = {
+          "Host *" = {
+            IdentityAgent = "~/.1password/agent.sock";
           };
         };
       };
