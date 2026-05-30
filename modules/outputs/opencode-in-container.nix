@@ -3,19 +3,15 @@
   ...
 }:
 {
-  flake.modules.homeManager.opencode =
+  perSystem =
+    { pkgs, ... }:
     {
-      config,
-      pkgs,
-      ...
-    }:
-    let
-      opencode-in-container = pkgs.writeShellApplication {
+      packages.opencode-in-container = pkgs.writeShellApplication {
         name = "opencode-in-container";
         text = ''
           printf "Running opencode in a container with %s as workspace. Continue? (y/N) " "$(pwd)"
 
-          mkdir -p ${config.xdg.configHome}/opencode ${config.xdg.dataHome}/opencode
+          mkdir -p "$HOME/.config/opencode" "$HOME/.local/share/opencode"
 
           read -r confirm
           if [ "$confirm" != "Y" ] && [ "$confirm" != "y" ]; then
@@ -28,15 +24,10 @@
             --security-opt seccomp=unconfined \
             --device /dev/fuse \
             -v "$(pwd):/workspace" \
-            -v ${config.xdg.configHome}/opencode:/root/.config/opencode \
-            -v ${config.xdg.dataHome}/opencode:/root/.local/share/opencode \
+            -v "$HOME/.config/opencode:/root/.config/opencode" \
+            -v "$HOME/.local/share/opencode:/root/.local/share/opencode" \
             -w /workspace ghcr.io/anomalyco/opencode:1.14.48 "$@"
         '';
       };
-    in
-    {
-      home.packages = [
-        opencode-in-container
-      ];
     };
 }
