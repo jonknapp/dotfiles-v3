@@ -11,7 +11,10 @@
         text = ''
           printf "Running opencode in a container with %s as workspace. Continue? (y/N) " "$(pwd)"
 
-          mkdir -p "$HOME/.config/opencode" "$HOME/.local/share/opencode"
+          XDG_CONFIG_HOME="''${XDG_CONFIG_HOME:-$HOME/.config}"
+          XDG_DATA_HOME="''${XDG_DATA_HOME:-$HOME/.local/share}"
+
+          mkdir -p "$XDG_CONFIG_HOME/opencode" "$XDG_DATA_HOME/opencode"
 
           read -r confirm
           if [ "$confirm" != "Y" ] && [ "$confirm" != "y" ]; then
@@ -24,8 +27,8 @@
             --security-opt seccomp=unconfined \
             --device /dev/fuse \
             -v "$(pwd):/workspace" \
-            -v "$HOME/.config/opencode:/root/.config/opencode" \
-            -v "$HOME/.local/share/opencode:/root/.local/share/opencode" \
+            -v "$XDG_CONFIG_HOME/opencode:/root/.config/opencode" \
+            -v "$XDG_DATA_HOME/opencode:/root/.local/share/opencode" \
             -w /workspace ghcr.io/anomalyco/opencode:1.14.48 "$@"
         '';
       };
