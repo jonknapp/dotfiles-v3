@@ -18,7 +18,7 @@
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-26.05";
     vykar = {
       url = "github:borgbase/vykar/main";
-      inputs.nixpkgs.follows = "nixpkgs-stable";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     wrappers = {
       url = "github:lassulus/wrappers";
