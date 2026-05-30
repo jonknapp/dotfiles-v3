@@ -15,7 +15,7 @@
     };
     import-tree.url = "github:vic/import-tree";
     nixpkgs.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
-    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.11";
+    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-26.05";
     vykar = {
       url = "github:borgbase/vykar/main";
       inputs.nixpkgs.follows = "nixpkgs-stable";
