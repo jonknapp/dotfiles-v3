@@ -18,4 +18,4 @@ jobs:
           # If you chose API tokens for write access OR if you have a private cache
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
       - run: nix build --no-link --print-out-paths .#vykar .#vykar-gui
-      - run: nix-shell --run "echo OK"
+      - run: nix run .#vykar -- --version
