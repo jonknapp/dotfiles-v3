@@ -61,7 +61,7 @@
             --volume "$(pwd):/workspace" \
             --volume "$XDG_CONFIG_HOME/opencode:/root/.config/opencode" \
             --volume "$XDG_DATA_HOME/opencode:/root/.local/share/opencode" \
-            --workdir /workspace ghcr.io/anomalyco/opencode:1.14.48 "$@"
+            --workdir /workspace ghcr.io/anomalyco/opencode:latest "$@"
         '';
       };
     };
