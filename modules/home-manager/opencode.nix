@@ -9,17 +9,12 @@
       packages.opencode-in-container = pkgs.writeShellApplication {
         name = "opencode-in-container";
         text = ''
-          printf "Running opencode in a container with %s as workspace. Continue? (y/N) " "$(pwd)"
+          printf "Running opencode in a container with %s at /workspace\n" "$(pwd)"
 
           XDG_CONFIG_HOME="''${XDG_CONFIG_HOME:-$HOME/.config}"
           XDG_DATA_HOME="''${XDG_DATA_HOME:-$HOME/.local/share}"
 
           mkdir -p "$XDG_CONFIG_HOME/opencode" "$XDG_DATA_HOME/opencode"
-
-          read -r confirm
-          if [ "$confirm" != "Y" ] && [ "$confirm" != "y" ]; then
-            exit 1
-          fi
 
           printf "Persist the container after use? (y/N) "
           read -r persist
