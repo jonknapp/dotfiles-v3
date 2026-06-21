@@ -138,6 +138,18 @@ let
       cp -L "$HOME/.config/nix-toolbox-profile/.ssh/config" "$HOME/.ssh/config"
     fi
 
+    if [ -f "$HOME/.config/opencode/opencode.json" ]; then
+      cp -pL "$HOME/.config/opencode/opencode.json" "$HOME/.config/opencode/opencode.json.tmp"
+      mv -f "$HOME/.config/opencode/opencode.json.tmp" "$HOME/.config/opencode/opencode.json"
+    fi
+
+    SKILLS_DIR="$HOME/.config/opencode/skills"
+    if [ -d "$SKILLS_DIR" ]; then
+      cp -rpL "$SKILLS_DIR" "$SKILLS_DIR.tmp"
+      rm -rf "$SKILLS_DIR"
+      mv "$SKILLS_DIR.tmp" "$SKILLS_DIR"
+    fi
+
     # Commented out because it seems to be called by Home Manager.
     # Should we include this outside of our initExtras bash hm config?
     # cp -f ~/.nix-profile/etc/profile.d/nix.sh ~/.bashrc.d/02-nix.sh
@@ -164,6 +176,8 @@ in
       run rm -rf ~/.config/fontconfig/conf.d
       run rm -rf ~/.config/fontconfig/fonts.conf
       run rm -rf ~/.config/systemd/user
+      run rm -rf ~/.config/opencode/opencode.json
+      run rm -rf ~/.config/opencode/skills
     '';
 
     home.activation.duplicateSystemdUnits = lib.hm.dag.entryAfter [ "linkGeneration" ] ''

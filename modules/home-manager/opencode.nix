@@ -75,5 +75,24 @@
       home.packages = [
         inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.opencode-in-container
       ];
+
+      xdg.configFile."opencode/opencode.json".text = builtins.toJSON {
+        "$schema" = "https://opencode.ai/config.json";
+        permission = {
+          "*" = "ask";
+          skill = {
+            opencode-in-container = "allow";
+          };
+        };
+        watcher = {
+          ignore = [
+            ".git/**"
+            "node_modules/**"
+          ];
+        };
+      };
+
+      xdg.configFile."opencode/skills/opencode-in-container/SKILL.md".source =
+        ./opencode/skills/opencode-in-container/SKILL.md;
     };
 }
