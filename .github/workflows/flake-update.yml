@@ -1,7 +1,7 @@
 name: "Flake Update"
 on:
   schedule:
-    - cron: "42 1 * * 0"
+    - cron: "42 1 * * 6"
   workflow_dispatch:
 jobs:
   update:
