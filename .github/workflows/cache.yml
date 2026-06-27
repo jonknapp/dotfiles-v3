@@ -2,9 +2,17 @@ name: "Cache"
 on:
   pull_request:
   push:
+  workflow_run:
+    workflows: ["Flake Update"]
+    types: [completed]
+    branches: [main]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   cachix:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
     steps:
@@ -15,6 +23,7 @@ jobs:
           nix_path: nixpkgs=channel:nixos-unstable
 
       - uses: cachix/cachix-action@18cf96c7c98e048e10a83abd92116114cd8504be # v14
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
         with:
           name: robots
           # If you chose signing key for write access
