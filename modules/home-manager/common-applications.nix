@@ -16,11 +16,11 @@
         git
         heroku
         opencode
+        pdf-extract
         ssh
         starship
         sublime-merge
         tailscale
-        to-markdown
         vscode
         vykar
         xdg
