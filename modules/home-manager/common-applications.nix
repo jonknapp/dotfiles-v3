@@ -20,6 +20,7 @@
         starship
         sublime-merge
         tailscale
+        to-markdown
         vscode
         vykar
         xdg
