@@ -43,11 +43,18 @@
           ocrmypdf
         ];
         text = ''
-          # Usage: pdf-extract <file> [output.md]
+          # Usage: pdf-extract <file> [outdir]
           #
-          # Extracts the content of a PDF, always producing two outputs:
-          #   <output>.md              - structured markdown of the text content
-          #   <output>-accessible.pdf  - searchable/accessible "sandwich PDF"
+          # Extracts the content of a PDF into a directory, producing:
+          #   <outdir>/<stem>.md             - markdown via ocrmypdf + pymupdf4llm
+          #   <outdir>/<stem>.pdf            - searchable PDF/A with OCR text layer
+          #
+          # Note: pymupdf4llm.to_text and to_json require the proprietary
+          # pymupdf-layout package which is not available in nixpkgs, so only
+          # to_markdown is used here.
+          #
+          # <outdir> defaults to a folder named after the input file (without
+          # extension), created in the same directory as the input file.
           #
           # Pipeline: ocrmypdf preprocesses scanned pages (deskew, clean,
           # rotation correction) and runs Tesseract, overlaying an invisible
@@ -56,7 +63,7 @@
           # pymupdf4llm then converts the now-searchable PDF to markdown.
 
           if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
-            printf "Usage: pdf-extract <file> [output.md]\n" >&2
+            printf "Usage: pdf-extract <file> [outdir]\n" >&2
             exit 1
           fi
 
@@ -67,17 +74,24 @@
             exit 1
           fi
 
-          # Default output path: replace extension with .md, or append .md
+          # Derive the stem (filename without extension) and the parent dir.
+          input_basename="$(basename "$input_file")"
+          input_dir="$(dirname "$input_file")"
+          stem="''${input_basename%.*}"
+          # If the file had no extension, avoid an empty stem.
+          if [ -z "$stem" ]; then stem="$input_basename"; fi
+
+          # Default output directory: <input_dir>/<stem>/
           if [ "$#" -eq 2 ]; then
-            output_file="$2"
+            out_dir="$2"
           else
-            output_file="''${input_file%.*}.md"
-            if [ "$output_file" = "$input_file" ]; then
-              output_file="$input_file.md"
-            fi
+            out_dir="$input_dir/$stem"
           fi
 
-          accessible_pdf="''${output_file%.md}-accessible.pdf"
+          mkdir -p "$out_dir"
+
+          accessible_pdf="$out_dir/$stem.pdf"
+          md_file="$out_dir/$stem.md"
 
           # Preprocess + OCR. --skip-text leaves pages with native text
           # untouched, so digital PDFs pass through unchanged.
@@ -86,22 +100,26 @@
             --deskew \
             --clean \
             --rotate-pages \
+            --clean-final \
+            --optimize 3 \
+            --output-type pdfa \
+            --pdfa-image-compression jpeg \
+            --ghostscript-jpeg-quality 40 \
             --language eng \
             "$input_file" "$accessible_pdf"
 
           # The OCR'd PDF now has a native text layer on every page, so
           # pymupdf4llm can convert it directly with full layout analysis.
-          python3 - "$accessible_pdf" "$output_file" <<'EOF'
+          python3 - "$accessible_pdf" "$md_file" <<'EOF'
           import sys
           import pathlib
           import pymupdf4llm
 
           accessible_pdf = sys.argv[1]
-          output_path = pathlib.Path(sys.argv[2])
+          md_path        = pathlib.Path(sys.argv[2])
 
-          md = pymupdf4llm.to_markdown(accessible_pdf)
-          output_path.write_text(md, encoding="utf-8")
-          print(f"Written: {output_path}")
+          md_path.write_text(pymupdf4llm.to_markdown(accessible_pdf), encoding="utf-8")
+          print(f"Written: {md_path}")
           EOF
 
           printf "Written: %s\n" "$accessible_pdf"
