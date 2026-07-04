@@ -1,7 +1,7 @@
 { inputs, ... }:
-{
-  flake.modules.homeManager.pdf-extract =
-    { pkgs, ... }:
+let
+  mkPdfExtract =
+    pkgs:
     let
       # Use tessdata_best models (float LSTM) instead of nixpkgs' default
       # standard tessdata: ~1-3% better character accuracy on degraded scans
@@ -35,14 +35,14 @@
       );
 
       pythonEnv = pkgs.python3.withPackages (ps: [ ps.pymupdf4llm ]);
-
-      pdf-extract = pkgs.writeShellApplication {
-        name = "pdf-extract";
-        runtimeInputs = [
-          pythonEnv
-          ocrmypdf
-        ];
-        text = ''
+    in
+    pkgs.writeShellApplication {
+      name = "pdf-extract";
+      runtimeInputs = [
+        pythonEnv
+        ocrmypdf
+      ];
+      text = ''
           # Usage: pdf-extract <file> [outdir]
           #
           # Extracts the content of a PDF into a directory, producing:
@@ -125,8 +125,17 @@
           printf "Written: %s\n" "$accessible_pdf"
         '';
       };
-    in
+in
+{
+  perSystem =
+    { pkgs, ... }:
     {
-      home.packages = [ pdf-extract ];
+      packages.pdf-extract = mkPdfExtract pkgs;
+    };
+
+  flake.modules.homeManager.pdf-extract =
+    { pkgs, ... }:
+    {
+      home.packages = [ (mkPdfExtract pkgs) ];
     };
 }
