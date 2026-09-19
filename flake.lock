@@ -75,11 +75,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1789183968,
-        "narHash": "sha256-pEWnYdIF1pBMZwarp/rEPzl+Lknhm5hhjSfeLxH8nAA=",
+        "lastModified": 1789765459,
+        "narHash": "sha256-voJJ5IZR4w2149u2Jm/j2zifeWROlpZQ+JzmCQwjgn8=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "cd1c9e552f41894aeb5cc5cb353d5a1d61550357",
+        "rev": "17903129f47656fa4d07e78ad87f6592ff4f2527",
         "type": "github"
       },
       "original": {
@@ -107,10 +107,10 @@
     "nixpkgs": {
       "locked": {
         "lastModified": 315532800,
-        "narHash": "sha256-vLblJRFZjrSBOyHD4jwBkGJm2iOVk8c9BJnzZTOojSc=",
-        "rev": "aff8a0b28396750446e5537a96461bc4facdb287",
+        "narHash": "sha256-j08lBbqaYwjsW0xy6Dh4MNZpQ/oSvLU1MLAo38OXphM=",
+        "rev": "a32edd7654519351e48e80372a928df336394670",
         "type": "tarball",
-        "url": "https://releases.nixos.org/nixpkgs/nixpkgs-26.11pre1071116.aff8a0b28396/nixexprs.tar.xz?lastModified=1789073787"
+        "url": "https://releases.nixos.org/nixpkgs/nixpkgs-26.11pre1075288.a32edd765451/nixexprs.tar.xz?lastModified=1789632929"
       },
       "original": {
         "type": "tarball",
@@ -119,11 +119,11 @@
     },
     "nixpkgs-stable": {
       "locked": {
-        "lastModified": 1789114715,
-        "narHash": "sha256-ugpsyk3NM2s87vXfUiIIiibbJ4Pp0JPS5p/3mfs+q+c=",
+        "lastModified": 1789749394,
+        "narHash": "sha256-cFTsMQz8Hzn8MT49oaeLSHg62tE86NykugCWkeM2ypk=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "21a67dc470149f337cecafbe965d8d252a390518",
+        "rev": "cf9d2fb3e50fa1cd5114c47505ea9177f7ff5f49",
         "type": "github"
       },
       "original": {
@@ -230,11 +230,11 @@
         "skia-binaries-x86_64-linux": "skia-binaries-x86_64-linux"
       },
       "locked": {
-        "lastModified": 1789062264,
-        "narHash": "sha256-N2tLh12qQUtFcmmukBgvQJCTRj4zCypeUrbUYqM6WZI=",
+        "lastModified": 1789549835,
+        "narHash": "sha256-bBNnai8H3MGyGASTxpHJRyFiI7V8Xe5jxZpXfKZu4iw=",
         "owner": "borgbase",
         "repo": "vykar",
-        "rev": "3fe8ab54578243d781bf9788a043172ad0b53447",
+        "rev": "468c0fbabab4a3b7bfbabfe157cf3ff1eb3e30b0",
         "type": "github"
       },
       "original": {
@@ -251,11 +251,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1788889659,
-        "narHash": "sha256-9yRvFaSIgYu85ZfNN55vHV2LQj06WbRqsRcppXkaWBI=",
+        "lastModified": 1789546006,
+        "narHash": "sha256-hv8Y2AcOGuCoI/5fVjPZzCAOygTbL9wvvY9HKXvvLEk=",
         "owner": "lassulus",
         "repo": "wrappers",
-        "rev": "7687cc2ffa72806ab595cb3e0f45b3cdcb44269e",
+        "rev": "e6676c0f59edd80dc1afb6a00047f5578095e4cb",
         "type": "github"
       },
       "original": {
