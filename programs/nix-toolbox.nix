@@ -7,6 +7,7 @@
 }:
 
 let
+  cachix = inputs.self.lib.cachix;
   cfg = config.programs.nixToolbox;
 
   homeManagerWrapper = inputs.wrappers.lib.wrapPackage {
@@ -15,6 +16,9 @@ let
     runtimeInputs = [ hostHostname ];
     flags = {
       "--flake" = "$HOME/.config/home-manager#$USER@$(host-hostname)";
+    };
+    env = {
+      NIX_CONFIG = "extra-substituters = ${cachix.substituter}\nextra-trusted-public-keys = ${cachix.trustedPublicKey}";
     };
     preHook = ''
       flake_found=false

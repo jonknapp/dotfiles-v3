@@ -1,4 +1,8 @@
 { ... }:
+let
+  substituter = "https://robots.cachix.org";
+  trustedPublicKey = "robots.cachix.org-1:HJAwawmBJ8NEvRI6DeibrmCO+9aAW3imFNRvI3dBrRA=";
+in
 {
   # Add Cachix binary caches so Nix pulls pre-built derivations from your cache
   # instead of building locally.
@@ -9,12 +13,16 @@
   # After changing these values, regenerate flake.nix:
   #   nix run .#write-flake
 
-  flake-file.nixConfig = {
-    extra-substituters = [
-      "https://robots.cachix.org"
-    ];
-    extra-trusted-public-keys = [
-      "robots.cachix.org-1:HJAwawmBJ8NEvRI6DeibrmCO+9aAW3imFNRvI3dBrRA="
-    ];
+  config = {
+    flake.lib = {
+      cachix = {
+        inherit substituter trustedPublicKey;
+      };
+    };
+
+    flake-file.nixConfig = {
+      extra-substituters = [ substituter ];
+      extra-trusted-public-keys = [ trustedPublicKey ];
+    };
   };
 }
