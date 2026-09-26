@@ -10,6 +10,7 @@
         name = "opencode-in-container";
         text = ''
           printf "Running opencode in a container with %s at /workspace\n" "$(pwd)"
+          printf "update opencode: %s\n" "podman pull ghcr.io/anomalyco/opencode:latest"
 
           XDG_CONFIG_HOME="''${XDG_CONFIG_HOME:-$HOME/.config}"
           XDG_DATA_HOME="''${XDG_DATA_HOME:-$HOME/.local/share}"
