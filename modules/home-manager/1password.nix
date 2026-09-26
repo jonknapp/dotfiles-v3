@@ -71,8 +71,9 @@
         (lib.hiPrio (
           pkgs.runCommand "1password-desktop-modify" { } ''
             mkdir -p $out/share/applications
-            substitute ${pkgs._1password-gui}/share/applications/1password.desktop $out/share/applications/1password.desktop \
-              --replace-fail "Exec=1password" "Exec=toolbox run --container ${config.programs.nixToolbox.containerName} 1password"
+            sed 's|Exec=1password|#Exec=1password\nExec=toolbox run --container ${config.programs.nixToolbox.containerName} 1password|g' \
+              ${pkgs._1password-gui}/share/applications/com.onepassword.OnePassword.desktop \
+              > $out/share/applications/com.onepassword.OnePassword.desktop
           ''
         ))
       ];
