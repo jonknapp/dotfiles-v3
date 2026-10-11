@@ -15,6 +15,7 @@
         fonts
         git
         heroku
+        nix-cleanup
         opencode
         ssh
         starship
