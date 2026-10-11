@@ -230,17 +230,17 @@
         "skia-binaries-x86_64-linux": "skia-binaries-x86_64-linux"
       },
       "locked": {
-        "lastModified": 1790928838,
-        "narHash": "sha256-Tw0vZfu+yX41O2LrQPPJ6V6AZ8Sw0ZcdQqqEBDuvZI8=",
+        "lastModified": 1789549835,
+        "narHash": "sha256-bBNnai8H3MGyGASTxpHJRyFiI7V8Xe5jxZpXfKZu4iw=",
         "owner": "borgbase",
         "repo": "vykar",
-        "rev": "db89109445d78bb251231f34f98e7941619857ff",
+        "rev": "468c0fbabab4a3b7bfbabfe157cf3ff1eb3e30b0",
         "type": "github"
       },
       "original": {
         "owner": "borgbase",
-        "ref": "main",
         "repo": "vykar",
+        "rev": "468c0fbabab4a3b7bfbabfe157cf3ff1eb3e30b0",
         "type": "github"
       }
     },

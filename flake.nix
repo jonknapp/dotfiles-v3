@@ -22,7 +22,7 @@
     nixpkgs.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.zst";
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-26.05";
     vykar = {
-      url = "github:borgbase/vykar/main";
+      url = "github:borgbase/vykar/468c0fbabab4a3b7bfbabfe157cf3ff1eb3e30b0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     wrappers = {
