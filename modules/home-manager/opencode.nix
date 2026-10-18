@@ -77,7 +77,26 @@
         permission = {
           "*" = "ask";
           skill = {
-            opencode-in-container = "allow";
+            "opencode-in-container" = "allow";
+          };
+          external_directory = {
+            "/workspace/**" = "allow";
+          };
+          read = {
+            "/workspace/**" = "allow";
+            "/workspace/.env*" = "deny";
+            "/workspace/**/.env*" = "deny";
+          };
+          edit = {
+            "/workspace/**" = "allow";
+            "/workspace/.env*" = "deny";
+            "/workspace/**/.env*" = "deny";
+          };
+          glob = {
+            "/workspace/**" = "allow";
+          };
+          list = {
+            "/workspace/**" = "allow";
           };
         };
         watcher = {
