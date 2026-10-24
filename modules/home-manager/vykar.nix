@@ -5,7 +5,7 @@
 {
   flake-file.inputs = {
     vykar = {
-      url = "github:borgbase/vykar/468c0fbabab4a3b7bfbabfe157cf3ff1eb3e30b0";
+      url = "github:borgbase/vykar/main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
