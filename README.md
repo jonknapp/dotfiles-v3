@@ -1,4 +1,5 @@
-https://github.com/Doc-Steve/dendritic-design-with-flake-parts
+- https://github.com/Doc-Steve/dendritic-design-with-flake-parts
+- https://github.com/thrix/nix-toolbox
 
 ```sh
 nix run home-manager/master -- switch --flake .#jon@zero
