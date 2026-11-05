@@ -35,10 +35,12 @@
           extra_flags=("--rm")
 
           if [ "$PERSIST" = "1" ]; then
-            CONTAINER_NAME="opencode-''${name_input:-$FOLDER_NAME}"
             extra_flags=()
-            printf "Container name [%s]: " "$CONTAINER_NAME"
+            printf "Container name [opencode-%s]: " "$FOLDER_NAME"
             read -r name_input
+            # Accept the name with or without the "opencode-" prefix.
+            name_input="''${name_input#opencode-}"
+            CONTAINER_NAME="opencode-''${name_input:-$FOLDER_NAME}"
 
             # If a container with this name already exists, restart it instead.
             if podman container exists "$CONTAINER_NAME" 2>/dev/null; then
