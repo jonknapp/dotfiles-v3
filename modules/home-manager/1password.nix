@@ -18,7 +18,9 @@
         binName = "op";
         wrapper = attrs: ''
           #!${pkgs.stdenv.shell}
-          sg onepassword-cli -c "${op}/bin/op $*"
+          # sg only accepts a single command string (run via `sh -c`), so each
+          # argument is shell-quoted with printf %q to preserve spaces/quotes.
+          exec sg onepassword-cli -c "$(printf '%q ' ${op}/bin/op "$@")"
         '';
       };
     in
