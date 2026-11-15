@@ -35,7 +35,18 @@
         vykar
         vykar-gui
       ];
-
+    };
+    
+   flake.modules.homeManager.nixToolbox =
+   {
+      config,
+      pkgs,
+      ...
+    }:
+    let
+      selfPackages = inputs.self.packages.${pkgs.stdenv.hostPlatform.system};
+    in
+    {
       xdg.desktopEntries = {
         vykar = {
           name = "Vykar - Backups";
