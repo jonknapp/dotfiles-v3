@@ -16,7 +16,7 @@
           scan_timeout = 10;
 
           character = {
-            success_symbol = "☕";
+            success_symbol = ">";
           };
           docker_context = {
             format = "via [$symbol]($style) ";
