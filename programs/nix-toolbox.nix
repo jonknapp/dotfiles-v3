@@ -18,7 +18,7 @@ let
       "--flake" = "$HOME/.config/home-manager#$USER@$(host-hostname)";
     };
     env = {
-      NIX_CONFIG = "extra-substituters = ${cachix.substituter}\nextra-trusted-public-keys = ${cachix.trustedPublicKey}";
+      NIX_CONFIG = "extra-substituters = ${cachix.substituter}";
     };
     preHook = ''
       flake_found=false

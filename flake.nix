@@ -5,7 +5,6 @@
 
   nixConfig = {
     extra-substituters = [ "https://robots.cachix.org" ];
-    extra-trusted-public-keys = [ "robots.cachix.org-1:HJAwawmBJ8NEvRI6DeibrmCO+9aAW3imFNRvI3dBrRA=" ];
   };
 
   inputs = {

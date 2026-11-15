@@ -20,9 +20,11 @@ in
       };
     };
 
+    # The public key is configured on the host in /etc/nix/nix.conf via
+    # `trusted-public-keys`. Sending it from the client is a restricted setting
+    # for untrusted users and only produces warnings.
     flake-file.nixConfig = {
       extra-substituters = [ substituter ];
-      extra-trusted-public-keys = [ trustedPublicKey ];
     };
   };
 }
