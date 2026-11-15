@@ -2,6 +2,7 @@
 - https://github.com/thrix/nix-toolbox
 
 ```sh
+nix run home-manager/master -- switch --flake .#jon@megaman
 nix run home-manager/master -- switch --flake .#jon@zero
 ```
 
