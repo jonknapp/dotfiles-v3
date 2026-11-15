@@ -131,6 +131,8 @@ let
     fi
 
     mkdir --parents ~/.bashrc.d
+    mkdir --parents ~/.ssh
+    chmod 700 ~/.ssh
 
     if [ -f ~/.nix-profile/etc/profile.d/hm-session-vars.sh ]; then
       # I think we want to always call this; inside toolbox or on host
