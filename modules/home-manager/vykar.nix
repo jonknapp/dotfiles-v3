@@ -21,9 +21,12 @@
       };
     };
 
+  # By default the Nix vykar-gui binary runs directly on the host (e.g.
+  # megaman). The nixToolbox module below overrides the desktop entry to run
+  # it inside the toolbox container instead (e.g. zero).
   flake.modules.homeManager.vykar =
     {
-      config,
+      lib,
       pkgs,
       ...
     }:
@@ -35,10 +38,22 @@
         vykar
         vykar-gui
       ];
+
+      xdg.desktopEntries = {
+        vykar = {
+          name = "Vykar - Backups";
+          exec = lib.mkDefault "${selfPackages.vykar-gui}/bin/vykar-gui";
+          terminal = false;
+          categories = [
+            "Network"
+          ];
+          icon = "application-x-executable";
+        };
+      };
     };
-    
-   flake.modules.homeManager.nixToolbox =
-   {
+
+  flake.modules.homeManager.nixToolbox =
+    {
       config,
       pkgs,
       ...
@@ -47,16 +62,7 @@
       selfPackages = inputs.self.packages.${pkgs.stdenv.hostPlatform.system};
     in
     {
-      xdg.desktopEntries = {
-        vykar = {
-          name = "Vykar - Backups";
-          exec = "toolbox run --container ${config.programs.nixToolbox.containerName} ${selfPackages.vykar-gui}/bin/vykar-gui";
-          terminal = false;
-          categories = [
-            "Network"
-          ];
-          icon = "application-x-executable";
-        };
-      };
+      # Run the GUI inside the toolbox container.
+      xdg.desktopEntries.vykar.exec = "toolbox run --container ${config.programs.nixToolbox.containerName} ${selfPackages.vykar-gui}/bin/vykar-gui";
     };
 }
