@@ -1,18 +1,54 @@
-- https://github.com/Doc-Steve/dendritic-design-with-flake-parts
-- https://github.com/thrix/nix-toolbox
-
-On a new machine, run the setup script first (see [New machine setup](#new-machine-setup)):
-
-```sh
-nix run .#setup-new-machine
-nix run home-manager/master -- switch --flake .#jon@megaman
-nix run home-manager/master -- switch --flake .#jon@zero
-```
+# Home Manager configurations
 
 - If you add new files, make sure to `git add` them so they are included as modules.
 - If you adjust any flake inputs, make sure to run `nix run .#write-flake` to rebuild `flake.nix`
 
-## New machine setup
+Ways to run these home-manager setups:
+
+```sh
+# via public github repo
+nix run home-manager/master -- switch --flake github:jonknapp/dotfiles-v3 # infer user & hostname
+nix run home-manager/master -- switch --flake github:jonknapp/dotfiles-v3#jon@megaman
+nix run home-manager/master -- switch --flake github:jonknapp/dotfiles-v3#jon@zero
+
+# via local code folder
+nix run home-manager/master -- switch --flake . # infer user & hostname
+nix run home-manager/master -- switch --flake .#jon@megaman
+nix run home-manager/master -- switch --flake .#jon@zero
+```
+
+## Initial machine setup from Fedora Atomic
+
+```sh
+# step 1: provides nix
+rpm-ostree rebase ostree-unverified-image:docker://ghcr.io/jonknapp/cosmic-atomic-nix:latest
+systemctl reboot
+
+# step 2: change to signed ostree containers
+rpm-ostree rebase ostree-image-signed:docker://ghcr.io/jonknapp/cosmic-atomic-nix:latest
+systemctl reboot
+
+# step 3: setup new machine and run initial home-manager setup
+# ACTION: set the machine name to match a homeConfiguration (jon@<hostname>),
+#         e.g. `hostnamectl set-hostname megaman`. When no `#output` is given,
+#         home-manager (and the wrapper) picks `$USER@$(hostname)` from the flake.
+nix run github:jonknapp/dotfiles-v3#setup-new-machine
+nix run home-manager/master -- switch -b backup --flake github:jonknapp/dotfiles-v3
+# ACTION: set up 1Password (installed by home-manager) so the SSH clone below works:
+#         - log out and back in (or open a new login shell) so SSH_AUTH_SOCK points at
+#           ~/.1password/agent.sock
+#         - open 1Password and sign in
+#         - Settings > Developer: enable "Use the SSH agent"
+#         - verify with `ssh -T git@github.com`
+
+# step 4: pull down git repo and symlink for local home-manager use
+mkdir -p ~/Projects && cd ~/Projects
+git clone git@github.com:jonknapp/dotfiles-v3.git
+ln -s ~/Projects/dotfiles-v3 ~/.config/home-manager
+home-manager news # test setup works
+```
+
+## New machine script
 
 `nix run .#setup-new-machine` performs one-time host setup (currently: binary
 cache trust, below). It detects a multi-user (daemon) vs single-user Nix install
@@ -87,6 +123,7 @@ is needed).
 
 The `nix-toolbox` home-manager wrapper likewise only sends `extra-substituters`.
 
-## TODO
+## Additional Information
 
-- [ ] check out [alternative wrapper lib](https://birdeehub.github.io/nix-wrapper-modules/home.html)
+- https://github.com/Doc-Steve/dendritic-design-with-flake-parts
+- https://github.com/thrix/nix-toolbox
