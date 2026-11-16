@@ -18,6 +18,9 @@ let
       "--flake" = "$HOME/.config/home-manager#$USER@$(host-hostname)";
     };
     env = {
+      # Only the substituter is sent: the public key is trusted on the host in
+      # /etc/nix/nix.conf, and sending it as an untrusted user only produces
+      # a restricted-setting warning on every invocation.
       NIX_CONFIG = "extra-substituters = ${cachix.substituter}";
     };
     preHook = ''
