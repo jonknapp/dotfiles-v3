@@ -3,30 +3,29 @@
   ...
 }:
 {
+  # Unprivileged tailscale: tailscaled runs as a systemd *user* service with
+  # userspace networking (no TUN, no root) and a socket in $XDG_RUNTIME_DIR.
+  # The systray is started on demand from the "Tailscale" desktop entry, which
+  # also pulls in tailscaled. Since the daemon runs as the same user as the
+  # client, no `tailscale set --operator` is needed.
+  #
+  # By default the Nix tailscale/tailscaled binaries run directly on the host
+  # (e.g. megaman). The nixToolbox module below overrides ExecStart to run
+  # them inside the toolbox container instead (e.g. zero).
   flake.modules.homeManager.tailscale =
     {
-      pkgs,
-      ...
-    }:
-    {
-      home.packages = with pkgs; [
-        tailscale
-
-        # used by tailscale systray for clipboard access in wayland
-        # https://tailscale.com/kb/1597/linux-systray#support-for-non-linux-desktops
-        wl-clipboard
-      ];
-    };
-
-  flake.modules.homeManager.nixToolbox =
-    {
-      config,
       lib,
       pkgs,
       ...
     }:
+    let
+      tailscaledArgs = "--tun=userspace-networking --socks5-server=localhost:1055 --outbound-http-proxy-listen=localhost:1055 --socket=%t/tailscaled.sock";
+    in
     {
-      home.packages = [
+      home.packages = with pkgs; [
+        tailscale
+
+        # point the CLI at the user tailscaled socket
         (lib.hiPrio (
           pkgs.stdenv.mkDerivation {
             pname = "wrapped-tailscale";
@@ -43,6 +42,10 @@
             '';
           }
         ))
+
+        # used by tailscale systray for clipboard access in wayland
+        # https://tailscale.com/kb/1597/linux-systray#support-for-non-linux-desktops
+        wl-clipboard
       ];
 
       systemd.user.services.tailscale-systray = {
@@ -59,9 +62,7 @@
         };
 
         Service = {
-          ExecStart = ''
-            toolbox --container ${config.programs.nixToolbox.containerName} run tailscale systray
-          '';
+          ExecStart = lib.mkDefault "${pkgs.tailscale}/bin/tailscale --socket=%t/tailscaled.sock systray";
           Type = "exec";
         };
       };
@@ -79,10 +80,8 @@
         };
 
         Service = {
-          ExecStart = ''
-            toolbox --container ${config.programs.nixToolbox.containerName} run tailscaled --tun=userspace-networking --socks5-server=localhost:1055 --outbound-http-proxy-listen=localhost:1055 --socket=%t/tailscaled.sock
-          '';
-          ExecStopPost = "tailscaled --socket=%t/tailscaled.sock --cleanup";
+          ExecStart = lib.mkDefault "${pkgs.tailscale}/bin/tailscaled ${tailscaledArgs}";
+          ExecStopPost = lib.mkDefault "${pkgs.tailscale}/bin/tailscaled --socket=%t/tailscaled.sock --cleanup";
           Restart = "on-failure";
           RuntimeDirectory = "tailscale";
           RuntimeDirectoryMode = "0755";
@@ -104,6 +103,26 @@
           ];
           icon = "application-x-executable";
         };
+      };
+    };
+
+  flake.modules.homeManager.nixToolbox =
+    {
+      config,
+      ...
+    }:
+    {
+      # Run the binaries inside the toolbox container (they are only on PATH
+      # there).
+      systemd.user.services.tailscale-systray.Service.ExecStart = ''
+        toolbox --container ${config.programs.nixToolbox.containerName} run tailscale systray
+      '';
+
+      systemd.user.services.tailscaled.Service = {
+        ExecStart = ''
+          toolbox --container ${config.programs.nixToolbox.containerName} run tailscaled --tun=userspace-networking --socks5-server=localhost:1055 --outbound-http-proxy-listen=localhost:1055 --socket=%t/tailscaled.sock
+        '';
+        ExecStopPost = "tailscaled --socket=%t/tailscaled.sock --cleanup";
       };
     };
 }
