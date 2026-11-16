@@ -50,8 +50,14 @@ home-manager news # test setup works
 
 ## New machine script
 
-`nix run .#setup-new-machine` performs one-time host setup (currently: binary
-cache trust, below). It detects a multi-user (daemon) vs single-user Nix install
+`nix run .#setup-new-machine` performs one-time host setup:
+
+- binary cache trust (below)
+- on Linux, creates the `onepassword-cli` group and adds your user to it (via
+  `sudo`), so the `op` wrapper from the 1Password module can use the desktop
+  app integration. Not needed for the 1Password SSH agent.
+
+For the binary cache, it detects a multi-user (daemon) vs single-user Nix install
 and edits the matching `nix.conf`. It is idempotent and safe to re-run:
 
 - every change is shown as a diff and confirmed before writing; `sudo` is only

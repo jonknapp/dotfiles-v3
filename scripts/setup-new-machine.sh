@@ -90,6 +90,9 @@ Steps:
   nix-binary-cache   Trust the ${SETUP_CACHE_SUBSTITUTER:-<cache>} binary cache.
                      multi-user (daemon): $SYSTEM_NIX_CONF (via sudo) + daemon restart
                      single-user:         $USER_NIX_CONF
+  1password-cli-group
+                     Create the onepassword-cli group and add the current user
+                     (Linux only, via sudo) for \`op\` desktop app integration.
 
 Options:
   -y, --yes                    Accept the default answer for every prompt.
@@ -413,6 +416,46 @@ step_nix_binary_cache() {
   fi
 }
 
+# 1Password desktop only trusts `op` when it runs with the onepassword-cli
+# group. Nix store paths can't be chgrp'd/setgid, so the home-manager `op`
+# wrapper (modules/home-manager/1password.nix) runs it via
+# `sg onepassword-cli`, which needs the group to exist and the user to be a
+# member. Not needed for the 1Password SSH agent.
+step_1password_cli_group() {
+  local group=onepassword-cli user
+  user=$(id -un)
+  header "1Password CLI group: $group"
+
+  if [[ $(uname -s) != Linux ]]; then
+    ok "not Linux; skipping"
+    return
+  fi
+  command -v getent >/dev/null || die "getent is required to check groups"
+
+  if getent group "$group" >/dev/null; then
+    ok "group $group exists"
+  elif $DRY_RUN; then
+    info "dry run: would run: sudo groupadd -f $group"
+  elif confirm "Create group '$group' (requires sudo)?" y; then
+    as_root groupadd -f "$group"
+    ok "created group $group"
+  else
+    warn "skipped creating group $group; \`op\` desktop app integration will not work"
+    return
+  fi
+
+  if getent group "$group" | cut -d: -f4 | tr ',' '\n' | grep -qxF -- "$user"; then
+    ok "$user is a member of $group"
+  elif $DRY_RUN; then
+    info "dry run: would run: sudo usermod -aG $group $user"
+  elif confirm "Add $user to group '$group' (requires sudo)?" y; then
+    as_root usermod -aG "$group" "$user"
+    ok "added $user to $group"
+  else
+    warn "skipped adding $user to $group; \`op\` desktop app integration will not work"
+  fi
+}
+
 # --------------------------------------------------------------------------
 # Main
 # --------------------------------------------------------------------------
@@ -451,6 +494,7 @@ main() {
   $DRY_RUN && info "dry run: no files will be changed"
 
   step_nix_binary_cache
+  step_1password_cli_group
 
   header "Done"
 }

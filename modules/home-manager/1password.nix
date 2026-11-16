@@ -11,6 +11,9 @@
     }:
     let
       op = pkgs._1password-cli;
+      # Runs `op` with the onepassword-cli group (stand-in for the setgid bit,
+      # which store paths can't have). The group and membership are created by
+      # `nix run .#setup-new-machine`.
       _1password-cli-sg = inputs.wrappers.lib.wrapPackage {
         inherit pkgs;
         package = op;
@@ -38,17 +41,6 @@
         SSH_AUTH_SOCK = "$HOME/.1password/agent.sock";
         # OP_BIOMETRIC_UNLOCK_ENABLED = "true";
         # OP_PLUGIN_ALIASES_SOURCED = "1";
-      };
-
-      programs.bash = {
-        initExtra = ''
-          # Add onepassword-cli group required for 1password CLI integration to work
-          if ! grep -q onepassword-cli /etc/group; then
-            echo "Adding 'onepassword-cli' group"
-            sudo groupadd -f onepassword-cli
-            sudo usermod -aG onepassword-cli $(whoami)
-          fi
-        '';
       };
 
       programs.ssh = {

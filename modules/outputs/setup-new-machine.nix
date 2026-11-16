@@ -3,7 +3,7 @@
   ...
 }:
 {
-  # One-time, idempotent host setup (binary cache trust, ...).
+  # One-time, idempotent host setup (binary cache trust, onepassword-cli group).
   #   nix run .#setup-new-machine
   perSystem =
     { pkgs, ... }:
@@ -14,8 +14,10 @@
           coreutils
           diffutils
           gawk
+          gnugrep
         ];
-        # sudo, systemctl and launchctl are intentionally taken from the host.
+        # sudo, systemctl, launchctl, getent, groupadd and usermod are
+        # intentionally taken from the host.
         runtimeEnv = {
           SETUP_CACHE_SUBSTITUTER = inputs.self.lib.cachix.substituter;
           SETUP_CACHE_PUBLIC_KEY = inputs.self.lib.cachix.trustedPublicKey;
