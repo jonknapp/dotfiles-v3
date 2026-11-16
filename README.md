@@ -1,13 +1,34 @@
 - https://github.com/Doc-Steve/dendritic-design-with-flake-parts
 - https://github.com/thrix/nix-toolbox
 
+On a new machine, run the setup script first (see [New machine setup](#new-machine-setup)):
+
 ```sh
+nix run .#setup-new-machine
 nix run home-manager/master -- switch --flake .#jon@megaman
 nix run home-manager/master -- switch --flake .#jon@zero
 ```
 
 - If you add new files, make sure to `git add` them so they are included as modules.
 - If you adjust any flake inputs, make sure to run `nix run .#write-flake` to rebuild `flake.nix`
+
+## New machine setup
+
+`nix run .#setup-new-machine` performs one-time host setup (currently: binary
+cache trust, below). It detects a multi-user (daemon) vs single-user Nix install
+and edits the matching `nix.conf`. It is idempotent and safe to re-run:
+
+- every change is shown as a diff and confirmed before writing; `sudo` is only
+  used when the target file is not writable (e.g. `/etc/nix/nix.conf`)
+- existing values are kept; it asks before adding to an existing line or
+  replacing a different value for the same key (e.g. a rotated public key)
+- the previous file is backed up as `nix.conf.bak-<timestamp>`
+- files managed by NixOS / nix-darwin / home-manager (symlinks) are left alone
+  and the equivalent `nix.settings` are printed instead
+
+Options: `--dry-run` (show changes only), `--yes` (accept defaults),
+`--mode daemon|single-user` (override detection). The script lives in
+`scripts/setup-new-machine.sh`; add further steps there.
 
 ## Binary cache trust
 
@@ -20,7 +41,8 @@ untrusted user only gets a warning:
 warning: ignoring the client-specified setting 'trusted-public-keys', because it is a restricted setting and you are not a trusted user
 ```
 
-Instead, trust the cache once per machine as described below. Without the key,
+Instead, trust the cache once per machine with `nix run .#setup-new-machine`, or
+manually as described below. Without the key,
 paths from the cache fail signature verification and Nix falls back to
 `cache.nixos.org` or building locally.
 
