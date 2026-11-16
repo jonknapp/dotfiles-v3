@@ -74,7 +74,14 @@ User clicks Quit (service inactive)
   -> exits instantly
 ```
 
-### Why toolbox run is used for ExecStart
+### Host vs. toolbox ExecStart
+
+The module (`flake.modules.homeManager.mock-service`) defaults `ExecStart` to the Nix store
+binaries (`lib.mkDefault`), which works when Nix is installed on the host (e.g. megaman — add
+`mock-service` to the host's imports). The `nixToolbox` module imports it automatically and
+overrides `ExecStart` with `toolbox ... run` (e.g. zero), for the reasons below.
+
+### Why toolbox run is used for ExecStart (nix-toolbox only)
 
 Home-manager runs inside the `nix-44` toolbox container, but systemd runs on the host.
 The `duplicateSystemdUnits` activation hook copies unit files to `~/.config/systemd/user/`

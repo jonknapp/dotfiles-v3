@@ -1,5 +1,4 @@
 {
-  config,
   lib,
   pkgs,
   ...
@@ -43,8 +42,10 @@ in
   # -----------------------------------------------------------------
   # Mock long-lived service
   # Loops forever: sleeps 10 s then logs a heartbeat via systemd-cat.
-  # ExecStart uses toolbox so the binary is found in the Nix profile
-  # inside the container; systemd-cat is on the host on Fedora Atomic.
+  # By default ExecStart points at the Nix store binary, which runs
+  # directly on the host (e.g. megaman). The nixToolbox module in
+  # modules/home-manager/mock-service.nix overrides it to run inside
+  # the toolbox container instead (e.g. zero).
   # -----------------------------------------------------------------
   systemd.user.services.mock-service = {
     Unit = {
@@ -53,7 +54,7 @@ in
 
     Service = {
       Type = "simple";
-      ExecStart = "toolbox --container ${config.programs.nixToolbox.containerName} run mock-service-run";
+      ExecStart = lib.mkDefault "${mockServiceBin}/bin/mock-service-run";
       Restart = "on-failure";
     };
   };
@@ -70,9 +71,7 @@ in
     };
 
     Service = {
-      ExecStart = ''
-        toolbox --container ${config.programs.nixToolbox.containerName} run mock-service-tray
-      '';
+      ExecStart = lib.mkDefault "${trayBin}/bin/mock-service-tray";
       Type = "exec";
       Restart = "on-failure";
       RestartSec = "3s";
