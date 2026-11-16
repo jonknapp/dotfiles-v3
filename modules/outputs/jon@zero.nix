@@ -12,7 +12,8 @@ in
       imports = with inputs.self.modules.homeManager; [
         base
         common-applications
-        cosmic-atomic
+        fedora-atomic
+        nix-in-toolbox
       ];
 
       programs.nixToolbox.containerName = "nix-44";

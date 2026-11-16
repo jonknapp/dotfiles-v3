@@ -12,6 +12,7 @@ in
       imports = with inputs.self.modules.homeManager; [
         base
         common-applications
+        fedora-atomic
       ];
     };
 
