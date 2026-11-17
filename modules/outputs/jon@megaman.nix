@@ -13,7 +13,10 @@ in
         base
         common-applications
         fedora-atomic
+        firefox
       ];
+
+      xdg.mimeApps.enable = true;
     };
 
   flake.homeConfigurations = inputs.self.lib.mkHomeManager {
