@@ -15,8 +15,6 @@ in
         fedora-atomic
         firefox
       ];
-
-      xdg.mimeApps.enable = true;
     };
 
   flake.homeConfigurations = inputs.self.lib.mkHomeManager {
