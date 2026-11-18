@@ -6,6 +6,7 @@
   flake.modules.homeManager.xdg =
     {
       config,
+      lib,
       pkgs,
       ...
     }:
@@ -14,11 +15,11 @@
       xdg.cacheHome = "${config.home.homeDirectory}/.cache";
       xdg.configHome = "${config.home.homeDirectory}/.config";
       xdg.dataHome = "${config.home.homeDirectory}/.local/share";
-      xdg.mimeApps.enable = true;
+      xdg.mimeApps.enable = lib.mkDefault true;
       xdg.stateHome = "${config.home.homeDirectory}/.local/state";
     };
 
-  flake.modules.homeManager.nixToolbox =
+  flake.modules.homeManager.nix-toolbox =
     {
       config,
       lib,

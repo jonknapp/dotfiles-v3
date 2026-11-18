@@ -1,5 +1,4 @@
 {
-  config,
   inputs,
   lib,
   pkgs,
@@ -8,7 +7,6 @@
 
 let
   cachix = inputs.self.lib.cachix;
-  cfg = config.programs.nixToolbox;
 
   homeManagerWrapper = inputs.wrappers.lib.wrapPackage {
     inherit pkgs;
@@ -171,8 +169,6 @@ let
 in
 {
   options.programs.nixToolbox = {
-    enable = lib.mkEnableOption "Toolbx container support for Nix";
-
     containerName = lib.mkOption {
       type = lib.types.str;
       default = "nix";
@@ -180,7 +176,7 @@ in
     };
   };
 
-  config = lib.mkIf cfg.enable {
+  config = {
     home.activation.clearSystemdUser = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
       run rm -rf ~/.config/fontconfig/conf.d
       run rm -rf ~/.config/fontconfig/fonts.conf
@@ -221,6 +217,5 @@ in
     programs.home-manager.enable = false;
 
     systemd.user.systemctlPath = "${hostBinaries}/bin/systemctl";
-    targets.genericLinux.enable = true;
   };
 }

@@ -13,7 +13,7 @@
       home.packages = with pkgs; [ discord ];
     };
 
-  flake.modules.homeManager.nixToolbox =
+  flake.modules.homeManager.nix-toolbox =
     {
       config,
       lib,

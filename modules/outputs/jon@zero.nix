@@ -13,7 +13,7 @@ in
         base
         common-applications
         fedora-atomic
-        nix-in-toolbox
+        nix-toolbox
       ];
 
       programs.nixToolbox.containerName = "nix-44";

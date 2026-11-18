@@ -5,7 +5,7 @@
 }:
 {
   # By default home-manager's fontconfig registers the Nix profile fonts with
-  # the host directly (e.g. megaman). The nixToolbox module below disables that
+  # the host directly (e.g. megaman). The nix-toolbox module below disables that
   # and instead points fontconfig at fonts copied out of the toolbox container
   # by the nix-toolbox post-activation script (e.g. zero), since the Nix store
   # paths referenced by home-manager's fontconfig files don't exist on the host.
@@ -42,7 +42,7 @@
       '';
     };
 
-  flake.modules.homeManager.nixToolbox = {
+  flake.modules.homeManager.nix-toolbox = {
     fonts.fontconfig.enable = false;
 
     xdg.configFile."fontconfig/fonts.conf".text = ''
