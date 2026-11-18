@@ -13,10 +13,8 @@ in
         base
         common-applications
         fedora-atomic
-        nix-toolbox
+        firefox
       ];
-
-      programs.nixToolbox.containerName = "nix-44";
     };
 
   flake.homeConfigurations = inputs.self.lib.mkHomeManager {
