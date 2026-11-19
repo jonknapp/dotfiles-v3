@@ -69,5 +69,5 @@ exclude_patterns: # Gitignore-style, relative to each source dir
   - "tmp/"
 
 schedule:
-  enabled: true
+  enabled: false
   every: "2h"
