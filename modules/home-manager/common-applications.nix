@@ -12,6 +12,7 @@
         chromium
         direnv
         discord
+        firefox
         fonts
         git
         heroku
@@ -33,6 +34,7 @@
         nixfmt
         podman-compose
         secretspec
+        slack
       ];
     };
 }

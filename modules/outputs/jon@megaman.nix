@@ -13,7 +13,6 @@ in
         base
         common-applications
         fedora-atomic
-        firefox
       ];
     };
 
