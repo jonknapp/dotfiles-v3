@@ -40,6 +40,10 @@ nix run home-manager/master -- switch -b backup --flake github:jonknapp/dotfiles
 #         - open 1Password and sign in
 #         - Settings > Developer: enable "Use the SSH agent"
 #         - verify with `ssh -T git@github.com`
+#         - Settings > Developer: enable "Integrate with 1Password CLI"
+# then re-run setup to configure vykar (skipped on the first run, before
+# home-manager has installed it):
+nix run github:jonknapp/dotfiles-v3#setup-new-machine
 
 # step 4: pull down git repo and symlink for local home-manager use
 mkdir -p ~/Projects && cd ~/Projects
@@ -56,6 +60,17 @@ home-manager news # test setup works
 - on Linux, creates the `onepassword-cli` group and adds your user to it (via
   `sudo`), so the `op` wrapper from the 1Password module can use the desktop
   app integration. Not needed for the 1Password SSH agent.
+- vykar: encrypts the repository passphrase (`op://cli/vykar/password`) as a
+  systemd user credential (`$XDG_CONFIG_HOME/vykar/passphrase.cred`, default
+  `~/.config`, bound to your user and this machine's host key / TPM; needs
+  systemd >= 256) if a working one isn't there yet, and renders
+  `$XDG_CONFIG_HOME/vykar/config.yaml` (mode 0600) from `config.yaml.template`
+  with `op inject`. The template is the source of truth: if the existing config
+  differs, it asks before overwriting it, keeps no backup (it would be another
+  plaintext copy of the secrets) and shows no diff. It also offers to delete
+  `config.yaml.bak-*` files left by older versions of the script. Skipped
+  until home-manager has installed vykar, so re-run the script after the first
+  `home-manager switch` and 1Password sign-in.
 
 For the binary cache, it detects a multi-user (daemon) vs single-user Nix install
 and edits the matching `nix.conf`. It is idempotent and safe to re-run:

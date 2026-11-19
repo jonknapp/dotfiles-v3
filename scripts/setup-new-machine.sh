@@ -16,6 +16,7 @@
 #   SETUP_SYSTEM_NIX_CONF    default: /etc/nix/nix.conf
 #   SETUP_USER_NIX_CONF      default: ${XDG_CONFIG_HOME:-~/.config}/nix/nix.conf
 #   SETUP_NIX_DAEMON_SOCKET  default: /nix/var/nix/daemon-socket/socket
+#   SETUP_VYKAR_CONFIG_DIR   default: ${XDG_CONFIG_HOME:-~/.config}/vykar
 set -euo pipefail
 
 PROG=setup-new-machine
@@ -27,6 +28,14 @@ MODE="" # daemon | single-user (auto-detected unless --mode is given)
 SYSTEM_NIX_CONF=${SETUP_SYSTEM_NIX_CONF:-/etc/nix/nix.conf}
 USER_NIX_CONF=${SETUP_USER_NIX_CONF:-${XDG_CONFIG_HOME:-$HOME/.config}/nix/nix.conf}
 NIX_DAEMON_SOCKET=${SETUP_NIX_DAEMON_SOCKET:-/nix/var/nix/daemon-socket/socket}
+VYKAR_CONFIG_DIR=${SETUP_VYKAR_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/vykar}
+
+# 1Password item holding the vykar repository encryption passphrase, and the
+# systemd user credential it is stored as (name and file must match
+# `passcommand` in modules/home-manager/vykar/config.yaml.template).
+VYKAR_PASSPHRASE_REF=op://cli/vykar/password
+VYKAR_CREDENTIAL_NAME=vykar-passphrase
+VYKAR_CREDENTIAL_FILE=$VYKAR_CONFIG_DIR/passphrase.cred
 
 TMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TMP_DIR"' EXIT
@@ -93,6 +102,11 @@ Steps:
   1password-cli-group
                      Create the onepassword-cli group and add the current user
                      (Linux only, via sudo) for \`op\` desktop app integration.
+  vykar              Encrypt the vykar passphrase from 1Password as a systemd
+                     user credential ($VYKAR_CREDENTIAL_FILE)
+                     and render $VYKAR_CONFIG_DIR/config.yaml
+                     from config.yaml.template with \`op inject\`.
+                     Skipped until home-manager has installed vykar.
 
 Options:
   -y, --yes                    Accept the default answer for every prompt.
@@ -456,6 +470,224 @@ step_1password_cli_group() {
   fi
 }
 
+# vykar (modules/home-manager/vykar.nix) reads its repository passphrase from a
+# systemd user credential via `passcommand` (no keyring/Secret Service needed,
+# and it decrypts without prompting, so scheduled backups work unattended). Its
+# other secrets are injected from 1Password into config.yaml. vykar, `op` and
+# the template are all installed by home-manager, and `op` needs the 1Password
+# app signed in, so on a fresh machine this step is skipped; re-run the script
+# once that is done.
+step_vykar() {
+  header "vykar backup config"
+
+  if ! command -v vykar >/dev/null; then
+    ok "vykar is not installed yet; skipping (re-run after home-manager switch)"
+    return
+  fi
+
+  local tool
+  for tool in op systemd-creds; do
+    if ! command -v "$tool" >/dev/null; then
+      warn "$tool not found; skipping vykar setup"
+      return
+    fi
+  done
+
+  if [[ ! -f $VYKAR_CONFIG_DIR/config.yaml.template ]]; then
+    warn "$VYKAR_CONFIG_DIR/config.yaml.template not found; skipping vykar setup"
+    warn "(it is installed by the home-manager vykar module)"
+    return
+  fi
+
+  vykar_store_passphrase || true
+  vykar_render_config
+}
+
+# Same decrypt as `passcommand` in the template, which also locates the file
+# via $XDG_CONFIG_HOME (default ~/.config). Prints the passphrase.
+vykar_decrypt_passphrase() {
+  systemd-creds --user decrypt --no-ask-password \
+    --name="$VYKAR_CREDENTIAL_NAME" "${1:-$VYKAR_CREDENTIAL_FILE}" -
+}
+
+# Encrypts the passphrase from 1Password into a systemd user credential, unless
+# a credential that decrypts on this machine already exists.
+vykar_store_passphrase() {
+  local cred=$VYKAR_CREDENTIAL_FILE tmp="$VYKAR_CREDENTIAL_FILE.tmp"
+  local passphrase decrypted
+
+  if [[ -e $cred ]]; then
+    if vykar_decrypt_passphrase >/dev/null 2>&1; then
+      ok "vykar passphrase credential exists: $cred"
+      return 0
+    fi
+    # Credentials are bound to the user, machine-id and host key / TPM, so a
+    # file copied from another machine or an old install won't decrypt.
+    warn "$cred exists but cannot be decrypted on this machine"
+  fi
+
+  if $DRY_RUN; then
+    info "dry run: would encrypt $VYKAR_PASSPHRASE_REF into $cred with systemd-creds --user"
+    return 0
+  fi
+
+  if ! confirm "Encrypt the vykar passphrase from 1Password into $cred (systemd-creds --user)?" y; then
+    warn "skipped; vykar's passcommand will fail until the credential exists"
+    return 1
+  fi
+
+  # Read into a variable first: piping `op read` straight into
+  # `systemd-creds encrypt` would store an empty secret if `op` fails.
+  if ! passphrase=$(op read "$VYKAR_PASSPHRASE_REF") || [[ -z $passphrase ]]; then
+    warn "could not read $VYKAR_PASSPHRASE_REF; make sure 1Password is running and"
+    warn "signed in, with Settings > Developer > \"Integrate with 1Password CLI\" enabled"
+    return 1
+  fi
+
+  mkdir -p -- "$VYKAR_CONFIG_DIR"
+  # printf is a builtin, so the passphrase never appears in a process's argv.
+  if ! (umask 077 && printf '%s' "$passphrase" |
+    systemd-creds --user encrypt --name="$VYKAR_CREDENTIAL_NAME" - "$tmp"); then
+    rm -f -- "$tmp"
+    warn "systemd-creds encrypt failed; user credentials need systemd >= 256"
+    warn "(check with: systemd-creds --version)"
+    return 1
+  fi
+
+  # Make sure vykar's passcommand will get the same passphrase back before
+  # replacing anything.
+  if ! decrypted=$(vykar_decrypt_passphrase "$tmp") || [[ $decrypted != "$passphrase" ]]; then
+    rm -f -- "$tmp"
+    warn "encrypted credential did not decrypt back to the passphrase; not saving it"
+    return 1
+  fi
+
+  mv -f -- "$tmp" "$cred"
+  ok "encrypted vykar passphrase into $cred"
+}
+
+# `op inject` inserts values verbatim, and the template keeps op:// references
+# in YAML single quotes. Compares TEMPLATE and RENDERED line by line and fails
+# (printing only line numbers, never values) if an injected value:
+#   - contains a single quote: the quote count on that line changes, and the
+#     YAML string would end early;
+#   - contains a newline: the line count changes;
+#   - contains "${": vykar expands that before parsing YAML, with no escape.
+vykar_check_injected() {
+  awk '
+    NR == FNR { tpl[FNR] = $0; n = FNR; next }
+    {
+      m = FNR
+      if (!(FNR in tpl) || !index(tpl[FNR], "op://")) next
+      t = tpl[FNR]; r = $0
+      if (gsub(/\047/, "", t) != gsub(/\047/, "", r) ||
+          (index($0, "${") && !index(tpl[FNR], "${"))) {
+        print "  line " FNR
+        bad = 1
+      }
+    }
+    END {
+      if (m != n) { print "  line count changed (" n " -> " m ")"; bad = 1 }
+      exit bad
+    }
+  ' "$1" "$2"
+}
+
+# Renders config.yaml from the home-manager template, resolving op:// secret
+# references with `op inject`. The result contains secrets, so it is written
+# with mode 0600, no diff is printed, and no backup is kept: the template plus
+# 1Password is the source of truth, so a backup would only be another
+# plaintext copy of the secrets.
+vykar_render_config() {
+  local template="$VYKAR_CONFIG_DIR/config.yaml.template"
+  local target="$VYKAR_CONFIG_DIR/config.yaml"
+  local rendered="$TMP_DIR/vykar-config.yaml"
+
+  vykar_remove_config_backups "$target"
+
+  if is_managed_symlink "$target"; then
+    warn "$target is a symlink ($(readlink -- "$target")); leaving it alone"
+    return
+  fi
+
+  if $DRY_RUN; then
+    info "dry run: would render $target from $template with \`op inject\`"
+    return
+  fi
+
+  # op inject treats every op:// in the file as a secret reference, comments
+  # included, and fails on (or worse, resolves) one written in a comment.
+  local commented
+  if commented=$(grep -n '#.*op://' -- "$template"); then
+    warn "$template mentions op:// in a comment; op inject would parse it."
+    warn "Reword these lines in modules/home-manager/vykar/config.yaml.template:"
+    local line
+    while IFS= read -r line; do printf '    %s\n' "$line"; done <<<"$commented" >&2
+    return
+  fi
+
+  if ! (umask 077 && op inject --in-file "$template" >"$rendered"); then
+    warn "op inject failed; make sure 1Password is running and signed in, with"
+    warn "Settings > Developer > \"Integrate with 1Password CLI\" enabled"
+    return
+  fi
+
+  local problems
+  if ! problems=$(vykar_check_injected "$template" "$rendered"); then
+    warn "not writing $target: a 1Password value would corrupt the config"
+    warn "(contains a single quote, newline or dollar-brace placeholder):"
+    warn "$problems"
+    return
+  fi
+
+  if [[ -e $target ]]; then
+    if cmp -s -- "$target" "$rendered"; then
+      ok "$target is already up to date"
+      return
+    fi
+    info "$target differs from the rendered template (diff not shown: it contains secrets)"
+    info "local edits are not kept; make lasting changes in config.yaml.template"
+    if ! confirm "Overwrite $target with the rendered template?" y; then
+      warn "kept existing $target"
+      return
+    fi
+  fi
+
+  # Write next to the target and rename, so vykar-gui (which reloads the config
+  # on change) never sees a missing or half-written file.
+  if install -m 0600 -- "$rendered" "$target.tmp" && mv -f -- "$target.tmp" "$target"; then
+    ok "wrote $target"
+  else
+    rm -f -- "$target.tmp"
+    warn "failed to write $target"
+  fi
+}
+
+# Earlier versions of this script kept config.yaml.bak-<timestamp> copies,
+# which hold plaintext secrets (and possibly the repository passphrase, from
+# before it moved to a systemd credential). Offers to delete them.
+vykar_remove_config_backups() {
+  local target=$1
+  local -a backups=()
+  local f
+
+  for f in "$target".bak-*; do
+    [[ -e $f ]] && backups+=("$f")
+  done
+  ((${#backups[@]} > 0)) || return 0
+
+  warn "found old config backups containing plaintext secrets:"
+  printf '    %s\n' "${backups[@]}" >&2
+  if $DRY_RUN; then
+    info "dry run: would delete them"
+  elif confirm "Delete these backups?" y; then
+    rm -f -- "${backups[@]}"
+    ok "deleted ${#backups[@]} old config backup(s)"
+  else
+    warn "kept old config backups"
+  fi
+}
+
 # --------------------------------------------------------------------------
 # Main
 # --------------------------------------------------------------------------
@@ -495,6 +727,7 @@ main() {
 
   step_nix_binary_cache
   step_1password_cli_group
+  step_vykar
 
   header "Done"
 }

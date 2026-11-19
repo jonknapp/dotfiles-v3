@@ -5,10 +5,11 @@
 }:
 {
   # By default home-manager's fontconfig registers the Nix profile fonts with
-  # the host directly (e.g. megaman). The nix-toolbox module below disables that
-  # and instead points fontconfig at fonts copied out of the toolbox container
-  # by the nix-toolbox post-activation script (e.g. zero), since the Nix store
-  # paths referenced by home-manager's fontconfig files don't exist on the host.
+  # the host directly (e.g. megaman, zero). The nix-toolbox module below
+  # disables that and instead points fontconfig at fonts copied out of the
+  # toolbox container by the nix-toolbox post-activation script, since the Nix
+  # store paths referenced by home-manager's fontconfig files don't exist on the
+  # host.
   #
   # COSMIC apps (cosmic-term etc.) don't use fontconfig for matching. Their
   # font loader (fontdb) reads ~/.config/fontconfig/fonts.conf first, then

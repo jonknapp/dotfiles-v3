@@ -1,0 +1,70 @@
+# vykar configuration file
+# Full reference: https://vykar.borgbase.com/configuration
+
+# 1Password secret references are filled in by `op inject` (via
+# setup-new-machine). Never write the reference prefix in a comment: op inject
+# parses comments too. Keep references in single quotes: the values are
+# inserted verbatim, and YAML single quotes treat `"` and `\` literally.
+# setup-new-machine refuses to write the result if a value contains a single
+# quote, a newline, or a dollar-brace placeholder (which vykar would expand).
+repositories:
+  - label: "borgbase"
+    url: 'op://cli/vykar/url'
+    access_token: 'op://cli/vykar/access_token'
+
+sources:
+  - label: Default
+    paths:
+      - /home/jon/Desktop/
+      - /home/jon/Documents/
+      - /home/jon/Downloads/
+      - /home/jon/Pictures/
+    exclude:
+      - ".cache/"
+
+  - label: Projects
+    paths:
+      - /home/jon/Projects/
+    git_ignore: true
+
+# --- Settings ---
+
+# Passphrase is a systemd user credential (encrypted with this machine's host
+# key / TPM, decryptable only by this user on this machine), stored at
+# $XDG_CONFIG_HOME/vykar/passphrase.cred (default ~/.config).
+# `nix run .#setup-new-machine` creates it from the 1Password item
+# cli/vykar/password.
+# Plain $VAR shell syntax on purpose: vykar would expand the braced form itself
+# when loading the config.
+encryption:
+  passcommand: 'd=$XDG_CONFIG_HOME; [ -n "$d" ] || d=$HOME/.config; exec systemd-creds --user decrypt --no-ask-password --name=vykar-passphrase "$d/vykar/passphrase.cred" -'
+
+retention:
+  keep_within: "2d" # keep every snapshot from the last 2 days
+  keep_daily: 7
+  keep_weekly: 4
+  keep_monthly: 6
+
+check:
+  max_percent: 5 # % of packs/snapshots verified per backup run
+  full_every: "90d" # full 100% check on this interval
+
+hooks:
+  failed:
+    - 'notify-send "vykar $VYKAR_COMMAND failed: $VYKAR_ERROR"'
+
+# compression:
+#   algorithm: zstd
+#   zstd_level: 3
+
+exclude_if_present:
+  - .nobackup
+
+exclude_patterns: # Gitignore-style, relative to each source dir
+  - "NO BACKUP/"
+  - "*.tmp"
+  - "tmp/"
+
+schedule:
+  enabled: true
+  every: "2h"

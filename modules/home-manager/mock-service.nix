@@ -2,7 +2,7 @@
 {
   # Demo tray + service. Not part of common-applications; import
   # `mock-service` in a host module to use it directly on the host (e.g.
-  # megaman). nix-toolbox hosts (e.g. zero) get it automatically below.
+  # megaman). nix-toolbox hosts get it automatically below.
   flake.modules.homeManager.mock-service = {
     imports = [ ../../programs/mock-service/default.nix ];
   };

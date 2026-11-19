@@ -22,8 +22,8 @@
     };
 
   # By default the Nix vykar-gui binary runs directly on the host (e.g.
-  # megaman). The nix-toolbox module below overrides the desktop entry to run
-  # it inside the toolbox container instead (e.g. zero).
+  # megaman, zero). The nix-toolbox module below overrides the desktop entry to
+  # run it inside the toolbox container instead.
   flake.modules.homeManager.vykar =
     {
       lib,
@@ -38,6 +38,9 @@
         vykar
         vykar-gui
       ];
+
+      # Reference config to copy from when creating a real vykar config.
+      xdg.configFile."vykar/config.yaml.template".source = ./vykar/config.yaml.template;
 
       xdg.desktopEntries = {
         vykar = {

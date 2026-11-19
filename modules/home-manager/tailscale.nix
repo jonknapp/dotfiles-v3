@@ -10,8 +10,8 @@
   # client, no `tailscale set --operator` is needed.
   #
   # By default the Nix tailscale/tailscaled binaries run directly on the host
-  # (e.g. megaman). The nix-toolbox module below overrides ExecStart to run
-  # them inside the toolbox container instead (e.g. zero).
+  # (e.g. megaman, zero). The nix-toolbox module below overrides ExecStart to
+  # run them inside the toolbox container instead.
   flake.modules.homeManager.tailscale =
     {
       lib,

@@ -79,7 +79,7 @@ User clicks Quit (service inactive)
 The module (`flake.modules.homeManager.mock-service`) defaults `ExecStart` to the Nix store
 binaries (`lib.mkDefault`), which works when Nix is installed on the host (e.g. megaman — add
 `mock-service` to the host's imports). The `nix-toolbox` module imports it automatically and
-overrides `ExecStart` with `toolbox ... run` (e.g. zero), for the reasons below.
+overrides `ExecStart` with `toolbox ... run`, for the reasons below.
 
 ### Why toolbox run is used for ExecStart (nix-toolbox only)
 
