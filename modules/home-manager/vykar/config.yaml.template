@@ -12,19 +12,22 @@ repositories:
     url: 'op://cli/vykar/url'
     access_token: 'op://cli/vykar/access_token'
 
+# Paths use the braced HOME placeholder, which vykar expands when it loads the
+# config (it fails loudly if HOME is unset), so the template is not tied to one
+# user. Don't write braced placeholders in comments: vykar expands those too.
 sources:
   - label: Default
     paths:
-      - /home/jon/Desktop/
-      - /home/jon/Documents/
-      - /home/jon/Downloads/
-      - /home/jon/Pictures/
+      - "${HOME}/Desktop/"
+      - "${HOME}/Documents/"
+      - "${HOME}/Downloads/"
+      - "${HOME}/Pictures/"
     exclude:
       - ".cache/"
 
   - label: Projects
     paths:
-      - /home/jon/Projects/
+      - "${HOME}/Projects/"
     git_ignore: true
 
 # --- Settings ---

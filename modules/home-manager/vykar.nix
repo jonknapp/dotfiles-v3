@@ -39,7 +39,10 @@
         vykar-gui
       ];
 
-      # Reference config to copy from when creating a real vykar config.
+      # Source of truth for vykar's config.yaml. `nix run .#setup-new-machine`
+      # renders it with `op inject` (filling in the 1Password secret
+      # references) into ~/.config/vykar/config.yaml, mode 0600. Edit this
+      # template, not the rendered file: local edits are not kept.
       xdg.configFile."vykar/config.yaml.template".source = ./vykar/config.yaml.template;
 
       xdg.desktopEntries = {

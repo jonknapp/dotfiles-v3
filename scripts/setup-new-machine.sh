@@ -4,9 +4,12 @@
 # Run with:
 #   nix run .#setup-new-machine -- [--yes] [--dry-run]
 #
-# Steps are safe to re-run. Every change is shown as a diff and confirmed
-# before it is written, existing files are backed up, and existing values are
-# never dropped without asking.
+# Steps are safe to re-run. Changes are confirmed before they are written, and
+# existing values are never dropped without asking. Changes to non-secret files
+# (nix.conf) are shown as a diff and the previous file is backed up. Files
+# holding secrets (vykar's config.yaml) are the exception: no diff is shown, no
+# backup is kept (it would be another plaintext copy), they are kept at mode
+# 0600, and they never pass through /tmp.
 #
 # Values are injected by the Nix package (modules/outputs/setup-new-machine.nix):
 #   SETUP_CACHE_SUBSTITUTER  binary cache URL
@@ -38,7 +41,19 @@ VYKAR_CREDENTIAL_NAME=vykar-passphrase
 VYKAR_CREDENTIAL_FILE=$VYKAR_CONFIG_DIR/passphrase.cred
 
 TMP_DIR=$(mktemp -d)
-trap 'rm -rf "$TMP_DIR"' EXIT
+# Path of a rendered vykar config (plaintext secrets) that has not been moved
+# into place yet; removed on exit. It lives next to config.yaml, not in
+# $TMP_DIR, so secrets never pass through /tmp.
+VYKAR_PENDING=""
+cleanup() {
+  rm -rf -- "$TMP_DIR"
+  if [[ -n $VYKAR_PENDING ]]; then rm -f -- "$VYKAR_PENDING"; fi
+}
+trap cleanup EXIT
+# Turn signals into a normal exit so the EXIT trap runs.
+trap 'exit 130' INT
+trap 'exit 143' TERM
+trap 'exit 129' HUP
 
 # --------------------------------------------------------------------------
 # Output / prompt helpers
@@ -593,22 +608,51 @@ vykar_check_injected() {
   ' "$1" "$2"
 }
 
+# config.yaml holds plaintext secrets, so it must only be readable by the user,
+# whatever created it (an older version of this script, vykar-gui, by hand).
+vykar_secure_config() {
+  local target=$1 mode
+  [[ -f $target ]] || return 0
+  mode=$(stat -c %a -- "$target")
+  [[ $mode == 600 ]] && return 0
+  if $DRY_RUN; then
+    info "dry run: would chmod 600 $target (currently $mode)"
+  elif chmod 600 -- "$target"; then
+    ok "restricted $target to mode 600 (was $mode)"
+  else
+    warn "failed to chmod 600 $target (currently $mode); it contains secrets"
+  fi
+}
+
 # Renders config.yaml from the home-manager template, resolving op:// secret
-# references with `op inject`. The result contains secrets, so it is written
-# with mode 0600, no diff is printed, and no backup is kept: the template plus
-# 1Password is the source of truth, so a backup would only be another
-# plaintext copy of the secrets.
+# references with `op inject`. The result contains secrets, so it is always
+# kept at mode 0600, no diff is printed, and no backup is kept: the template
+# plus 1Password is the source of truth, so a backup would only be another
+# plaintext copy of the secrets. The render is written to a 0600 temp file in
+# the vykar config dir (never /tmp) and renamed into place.
 vykar_render_config() {
   local template="$VYKAR_CONFIG_DIR/config.yaml.template"
   local target="$VYKAR_CONFIG_DIR/config.yaml"
-  local rendered="$TMP_DIR/vykar-config.yaml"
-
-  vykar_remove_config_backups "$target"
+  local render_prefix="$VYKAR_CONFIG_DIR/.config.yaml.render-"
+  local rendered f
 
   if is_managed_symlink "$target"; then
     warn "$target is a symlink ($(readlink -- "$target")); leaving it alone"
     return
   fi
+
+  vykar_secure_config "$target"
+
+  # Renders left behind by a run that was killed before its cleanup ran.
+  for f in "$render_prefix"*; do
+    [[ -e $f ]] || continue
+    if $DRY_RUN; then
+      info "dry run: would delete leftover render $f"
+    else
+      rm -f -- "$f"
+      info "deleted leftover render $f"
+    fi
+  done
 
   if $DRY_RUN; then
     info "dry run: would render $target from $template with \`op inject\`"
@@ -626,7 +670,29 @@ vykar_render_config() {
     return
   fi
 
-  if ! (umask 077 && op inject --in-file "$template" >"$rendered"); then
+  mkdir -p -- "$VYKAR_CONFIG_DIR"
+  # mktemp creates the file with mode 0600. Same directory as the target, so
+  # the final mv is an atomic rename and vykar-gui (which reloads the config
+  # on change) never sees a missing or half-written file.
+  if ! rendered=$(mktemp -- "${render_prefix}XXXXXX"); then
+    warn "could not create a temporary file in $VYKAR_CONFIG_DIR"
+    return
+  fi
+  VYKAR_PENDING=$rendered
+
+  vykar_render_config_to "$template" "$target" "$rendered"
+
+  rm -f -- "$rendered"
+  VYKAR_PENDING=""
+  vykar_secure_config "$target"
+}
+
+# vykar_render_config_to TEMPLATE TARGET RENDERED
+# Fills RENDERED (an existing 0600 file) and moves it onto TARGET if accepted.
+vykar_render_config_to() {
+  local template=$1 target=$2 rendered=$3
+
+  if ! op inject --in-file "$template" >"$rendered"; then
     warn "op inject failed; make sure 1Password is running and signed in, with"
     warn "Settings > Developer > \"Integrate with 1Password CLI\" enabled"
     return
@@ -647,44 +713,16 @@ vykar_render_config() {
     fi
     info "$target differs from the rendered template (diff not shown: it contains secrets)"
     info "local edits are not kept; make lasting changes in config.yaml.template"
-    if ! confirm "Overwrite $target with the rendered template?" y; then
+    if ! confirm "Overwrite $target with the rendered template?" n; then
       warn "kept existing $target"
       return
     fi
   fi
 
-  # Write next to the target and rename, so vykar-gui (which reloads the config
-  # on change) never sees a missing or half-written file.
-  if install -m 0600 -- "$rendered" "$target.tmp" && mv -f -- "$target.tmp" "$target"; then
+  if chmod 600 -- "$rendered" && mv -f -- "$rendered" "$target"; then
     ok "wrote $target"
   else
-    rm -f -- "$target.tmp"
     warn "failed to write $target"
-  fi
-}
-
-# Earlier versions of this script kept config.yaml.bak-<timestamp> copies,
-# which hold plaintext secrets (and possibly the repository passphrase, from
-# before it moved to a systemd credential). Offers to delete them.
-vykar_remove_config_backups() {
-  local target=$1
-  local -a backups=()
-  local f
-
-  for f in "$target".bak-*; do
-    [[ -e $f ]] && backups+=("$f")
-  done
-  ((${#backups[@]} > 0)) || return 0
-
-  warn "found old config backups containing plaintext secrets:"
-  printf '    %s\n' "${backups[@]}" >&2
-  if $DRY_RUN; then
-    info "dry run: would delete them"
-  elif confirm "Delete these backups?" y; then
-    rm -f -- "${backups[@]}"
-    ok "deleted ${#backups[@]} old config backup(s)"
-  else
-    warn "kept old config backups"
   fi
 }
 

@@ -64,13 +64,14 @@ home-manager news # test setup works
   systemd user credential (`$XDG_CONFIG_HOME/vykar/passphrase.cred`, default
   `~/.config`, bound to your user and this machine's host key / TPM; needs
   systemd >= 256) if a working one isn't there yet, and renders
-  `$XDG_CONFIG_HOME/vykar/config.yaml` (mode 0600) from `config.yaml.template`
-  with `op inject`. The template is the source of truth: if the existing config
-  differs, it asks before overwriting it, keeps no backup (it would be another
-  plaintext copy of the secrets) and shows no diff. It also offers to delete
-  `config.yaml.bak-*` files left by older versions of the script. Skipped
-  until home-manager has installed vykar, so re-run the script after the first
-  `home-manager switch` and 1Password sign-in.
+  `$XDG_CONFIG_HOME/vykar/config.yaml` from `config.yaml.template` with
+  `op inject`. The rendered file is written next to the target (never via
+  `/tmp`) and the config is always kept at mode 0600. The template is the
+  source of truth: if the existing config differs, it asks before overwriting
+  it (default: no, also with `--yes`), keeps no backup (it would be another
+  plaintext copy of the secrets) and shows no diff. Skipped until home-manager
+  has installed vykar, so re-run the script after the first `home-manager
+  switch` and 1Password sign-in.
 
 For the binary cache, it detects a multi-user (daemon) vs single-user Nix install
 and edits the matching `nix.conf`. It is idempotent and safe to re-run:
