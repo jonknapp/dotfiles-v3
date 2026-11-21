@@ -1,0 +1,24 @@
+{
+  inputs,
+  ...
+}:
+let
+  host = "electopia";
+in
+{
+  flake.modules.homeManager.${host} =
+    { pkgs, ... }:
+    {
+      imports = with inputs.self.modules.homeManager; [
+        base
+        common-applications
+        fedora-atomic
+      ];
+    };
+
+  flake.homeConfigurations = inputs.self.lib.mkHomeManager {
+    inherit host;
+    system = "x86_64-linux";
+    user = "jon";
+  };
+}
