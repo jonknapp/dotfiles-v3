@@ -153,11 +153,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1795168384,
-        "narHash": "sha256-aQ4Ns5O78Pg6B1i2hNRbI1HpRtnZst/jW34MSOOeaX4=",
+        "lastModified": 1789024335,
+        "narHash": "sha256-kCy/MVLRIr95DJ4vspVzWj+kO/x+JuwSHmYZCvShg8w=",
         "owner": "oxalica",
         "repo": "rust-overlay",
-        "rev": "a5c999945da3991d7aa3cc2a6075cfd22bd387e9",
+        "rev": "577bb1e1fc5af0713169176c5c76622c21fa3ec0",
         "type": "github"
       },
       "original": {
@@ -169,37 +169,37 @@
     "skia-binaries-aarch64-darwin": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-aOVPjqdLFq+h1DKZE2XNV3dqfjfiKDKo6fMZhonbG88=",
+        "narHash": "sha256-xvggRt63Hnm0JrKNRcbVmhYMTgfGCeGR/ovQx/zZjYM=",
         "type": "file",
-        "url": "https://github.com/rust-skia/skia-binaries/releases/download/0.157.0/skia-binaries-30669978c3f39a73e8a7-aarch64-apple-darwin-ganesh-gl-jpegd-jpege-metal-pdf.tar.gz"
+        "url": "https://github.com/rust-skia/skia-binaries/releases/download/0.153.3/skia-binaries-b7f043e0b1e2a850e702-aarch64-apple-darwin-ganesh-gl-jpegd-jpege-metal-pdf.tar.gz"
       },
       "original": {
         "type": "file",
-        "url": "https://github.com/rust-skia/skia-binaries/releases/download/0.157.0/skia-binaries-30669978c3f39a73e8a7-aarch64-apple-darwin-ganesh-gl-jpegd-jpege-metal-pdf.tar.gz"
+        "url": "https://github.com/rust-skia/skia-binaries/releases/download/0.153.3/skia-binaries-b7f043e0b1e2a850e702-aarch64-apple-darwin-ganesh-gl-jpegd-jpege-metal-pdf.tar.gz"
       }
     },
     "skia-binaries-aarch64-linux": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-IQzlLUB27mH3k/3i+thNq22Vcg5mifcZwufJ8q/37Xo=",
+        "narHash": "sha256-V54eBeGUnFZmERuQJzjYHcQWzHfXku5rfnZ5VPpImyI=",
         "type": "file",
-        "url": "https://github.com/rust-skia/skia-binaries/releases/download/0.157.0/skia-binaries-30669978c3f39a73e8a7-aarch64-unknown-linux-gnu-ganesh-gl-jpegd-jpege-pdf-vulkan.tar.gz"
+        "url": "https://github.com/rust-skia/skia-binaries/releases/download/0.153.3/skia-binaries-b7f043e0b1e2a850e702-aarch64-unknown-linux-gnu-ganesh-gl-jpegd-jpege-pdf-vulkan.tar.gz"
       },
       "original": {
         "type": "file",
-        "url": "https://github.com/rust-skia/skia-binaries/releases/download/0.157.0/skia-binaries-30669978c3f39a73e8a7-aarch64-unknown-linux-gnu-ganesh-gl-jpegd-jpege-pdf-vulkan.tar.gz"
+        "url": "https://github.com/rust-skia/skia-binaries/releases/download/0.153.3/skia-binaries-b7f043e0b1e2a850e702-aarch64-unknown-linux-gnu-ganesh-gl-jpegd-jpege-pdf-vulkan.tar.gz"
       }
     },
     "skia-binaries-x86_64-linux": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-U0Rj9Tb8pJtNfYOkELgKnCjQ2p9H8xvNlNnJ3HYoKC4=",
+        "narHash": "sha256-7CPpejwgNk/E7P+rgc15cYVb738CuAfRR9FDlTPLCO4=",
         "type": "file",
-        "url": "https://github.com/rust-skia/skia-binaries/releases/download/0.157.0/skia-binaries-30669978c3f39a73e8a7-x86_64-unknown-linux-gnu-ganesh-gl-jpegd-jpege-pdf-vulkan.tar.gz"
+        "url": "https://github.com/rust-skia/skia-binaries/releases/download/0.153.3/skia-binaries-b7f043e0b1e2a850e702-x86_64-unknown-linux-gnu-ganesh-gl-jpegd-jpege-pdf-vulkan.tar.gz"
       },
       "original": {
         "type": "file",
-        "url": "https://github.com/rust-skia/skia-binaries/releases/download/0.157.0/skia-binaries-30669978c3f39a73e8a7-x86_64-unknown-linux-gnu-ganesh-gl-jpegd-jpege-pdf-vulkan.tar.gz"
+        "url": "https://github.com/rust-skia/skia-binaries/releases/download/0.153.3/skia-binaries-b7f043e0b1e2a850e702-x86_64-unknown-linux-gnu-ganesh-gl-jpegd-jpege-pdf-vulkan.tar.gz"
       }
     },
     "systems": {
@@ -230,16 +230,16 @@
         "skia-binaries-x86_64-linux": "skia-binaries-x86_64-linux"
       },
       "locked": {
-        "lastModified": 1795390765,
-        "narHash": "sha256-EhNmBWLOcCyeQWzK5P7iz5ffDOOMWwijfWvr3qILhWQ=",
+        "lastModified": 1795099754,
+        "narHash": "sha256-OSs7m+GCVViSxB8c+xkxp6YPOd99cpPfRK7QZfWoSSE=",
         "owner": "borgbase",
         "repo": "vykar",
-        "rev": "571418362fd23727d04cbe9cb67c44d791ffd49d",
+        "rev": "cd6782db29bff6638581758af72efcfda1267985",
         "type": "github"
       },
       "original": {
         "owner": "borgbase",
-        "ref": "main",
+        "ref": "v0.24.0",
         "repo": "vykar",
         "type": "github"
       }
