@@ -26,6 +26,7 @@
 
           advice.skippedCherryPicks = false;
           # core.editor = "${pkgs.vscode}/bin/code --wait";
+          checkout.defaultRemote = "origin";
           diff.tool = "bc";
           difftool.bc.trustExitCode = true;
           difftool.prompt = false;
